@@ -2341,28 +2341,38 @@ sub fixExprPath {
 # Returns 1 if sucessfully added 0 if not
 #
 sub insertExpr {
-	my($self, $reusedRefs, $dl, $topRef, $name, $depth, $dirPath) = @_ ;
-	my($theRef, $label, $type, $result, $saveW, $selfCnt) ;
+	my($self, $reusedRefs, $dl, $theRef, $name, $depth, $dirPath) = @_ ;
+	my($label, $type, $result, $saveW, $selfCnt, @circRefs) ;
 
 	#
 	# Add data new data entries to the bottom
 	# 
 	$dirPath = "" unless defined $dirPath ;
 
-	$theRef = $topRef ;
 	$label = "" ;
 	$selfCnt = 0 ;
 
 	while( ref $theRef eq 'SCALAR' ) {
 		$theRef = $$theRef ;
 	}
+
+	$saveW = $^W ;
+	$^W = 0 ; # spare us uncessary warnings about comparing strings with == 
 	
  REF_CHECK: for( ; ; ) {
+	 push @circRefs, $theRef ;
 	 $type = ref $theRef ;
 	 last unless ($type	eq "REF")	 ;
 	 $theRef = $$theRef ; # dref again
+	 
 	 $label .= "\\" ; # append a 
+	 if( grep $_ == $theRef, @circRefs ) {
+		 $label .= "(circular)" ;
+		 last ;
+	 }
  }
+
+	$^W = $saveW ;
 
 	if( !$type || $type eq "" || $type eq "GLOB" || $type eq "CODE") {
 		$saveW = $^W ;
@@ -3312,7 +3322,7 @@ package DB ;
 
 use vars '$VERSION', '$header' ;
 
-$VERSION = '1.1065' ;
+$VERSION = '1.1066' ;
 $header = "ptkdb.pm version $DB::VERSION";
 $DB::window->{current_file} = "" ;
 
