@@ -1709,13 +1709,13 @@ sub sub_list_cmd {
 
 } # end of sub_list_cmd
 
-sub setup_subs_page {
+sub fill_subs_page {
   my($self) = @_ ;
 
-  $self->{'sub_list'} = $self->{'subs_page'}->Scrolled('HList',  -command => sub { $self->sub_list_cmd(@_) ; } ) ;
+  $self->{'sub_list'}->delete('all') ; # clear existing entries
 
   my @list = keys %DB::sub ;
-  
+
   $Devel::ptkdb::subs_tree = tree_split(\@list, "::") ;
 
   # setup to level of list
@@ -1723,9 +1723,21 @@ sub setup_subs_page {
   for ( sort keys %$Devel::ptkdb::subs_tree ) {
     $self->{'sub_list'}->add($_, -text => $_) ;
   } # end of top level loop
+}
+
+sub setup_subs_page {
+  my($self) = @_ ;
+
+  $self->{'sub_list'} = $self->{'subs_page'}->Scrolled('HList',  -command => sub { $self->sub_list_cmd(@_) ; } ) ;
+
+  $self->fill_subs_page() ;
 
   $self->{'sub_list'}->pack(side => 'left', fill => 'both', expand => 1
 			   ) ;
+
+  $self->{'subs_list_cnt'} = scalar keys %DB::sub ;
+
+
 } # end of setup_subs_page
 
 sub setup_search_panel {
@@ -3169,7 +3181,7 @@ package DB ;
 
 use vars '$VERSION', '$header' ;
 
-$VERSION = '1.1052' ;
+$VERSION = '1.1053' ;
 $header = "ptkdb.pm version $DB::VERSION";
 $DB::window->{current_file} = "" ;
 
@@ -3675,7 +3687,7 @@ sub dbexit {
 sub DB {
   $DB::save_err = $@ ; # save value of $@
   my ($package, $filename, $line) = caller ;
-  my $stop ;
+  my ($stop, $cnt) ;
 
   # print "DB::DB called from $package, $filename, $line\n" ;
 
@@ -3728,6 +3740,15 @@ sub DB {
   #
   updateExprs($package) ;
 
+  #
+  # Update subs Page if necessary
+  #
+  $cnt = scalar keys %DB::sub ;
+  if ( $cnt != $DB::window->{'subs_list_cnt'} ) {
+    print "refilling subs\n" ;
+    $DB::window->fill_subs_page() ;
+    $DB::window->{'subs_list_cnt'} = $cnt ;
+  }
   #
   # Update the subroutine stack menu
   #

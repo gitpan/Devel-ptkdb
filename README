@@ -1,3 +1,15 @@
+Majordomo Mailing List for ptkdb news and info available at:
+
+ptkdb-request@world.std.com
+
+Send a mail message with the following body:
+
+subscribe
+end
+
+
+1.1053  Added code that will update the 'subs' list when new code
+        is brought in through 'require' statements.
 
 1.1052  Added a configuration option that allows users to change
         the packing arrangement of the code and notebook panes.  

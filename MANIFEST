@@ -5,3 +5,4 @@ Makefile.PL
 ptkdb.pm
 test.pl
 install_ptkdb.pl.gz
+MAILING_LIST.txt
