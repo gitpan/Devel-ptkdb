@@ -17,3 +17,12 @@ Revision history for Perl extension Devel::ptkdb.
 1.102
 
 	Updated install_ptkdb.pl to changes above
+
+1.104
+
+	Fixed a conflict with 'qw' and perl 5.004.
+
+        Fixed a warning issued with perl 5.004
+
+        Corrected a problem with where using ptkdb for 
+        debugging other ptk apps would cause 'grab' problems.

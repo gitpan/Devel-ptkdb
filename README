@@ -1,4 +1,16 @@
 
+1.104
+
+
+	Fixed a conflict with 'qw' and perl 5.004.
+
+        Fixed a warning issued with perl 5.004
+
+        Corrected a problem with where using ptkdb for 
+        debugging other ptk apps would cause 'grab' problems.
+
+
+
    This is version 1.1 of ptkdb, a debugger for perl that uses the
 perlTk user interface.   It features pushbutton controls for run,
 step-in, step-out, return, controls for breakpoints, expression

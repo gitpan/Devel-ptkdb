@@ -94,7 +94,7 @@
 
 
 use strict ;
-use vars qw($VERSION, @dbline, %dbline);
+use vars qw($VERSION @dbline %dbline);
 
 #
 # This package is the main_window object
@@ -3067,7 +3067,8 @@ sub code_motion_eval {
 sub EnterActions {
     my($self) = @_ ;
 
-    $self->{'main_window'}->Unbusy() ;
+#    $self->{'main_window'}->Unbusy() ;
+
 } # end of EnterActions
 
 #
@@ -3077,7 +3078,7 @@ sub EnterActions {
 sub LeaveActions {
     my($self) = @_ ;
     
-    $self->{'main_window'}->Busy() ;
+  #  $self->{'main_window'}->Busy() ;
 } # end of LeaveActions
 
 1 ; # end of Devel::ptkdb
@@ -3086,7 +3087,7 @@ package DB ;
 
 use vars '$VERSION', '$header' ;
 
-$VERSION = '1.102' ;
+$VERSION = '1.104' ;
 $header = "ptkdb.pm version $DB::VERSION";
 $DB::window->{current_file} = "" ;
 
@@ -3262,6 +3263,8 @@ sub fix_breakpoints {
     my(@brkPts) = @_ ;
     my($startLine, $endLine, $nLines, $brkPt) ;
     my (@retList) ;
+    my $saveW = $^W ;
+    $^W = 0 ;
 
     $nLines = scalar @dbline ;
 
@@ -3277,7 +3280,8 @@ sub fix_breakpoints {
 	    last ;
 	}
     } # end of breakpoint list
-
+    
+    $^W = $saveW ;
     return @retList ;
 
 } # end of fix_breakpoints
