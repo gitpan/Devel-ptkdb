@@ -7,6 +7,8 @@ package DB ;
 ##
 sub DB {}
 
+
+
 use Tk ;
 
 #
@@ -15,7 +17,7 @@ use Tk ;
 #
 #        ptkdb Perl Tk perl Debugger
 #
-#          Copyright 1998, Andrew E. Page
+#          Copyright 1998, 2003, Andrew E. Page
 #         All rights reserved.
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -108,6 +110,7 @@ use Tk ;
 use strict ;
 use vars qw($VERSION @dbline %dbline);
 
+
 #
 # This package is the main_window object
 # for the debugger.  We start with the Devel::
@@ -116,6 +119,13 @@ use vars qw($VERSION @dbline %dbline);
 # subdir of a directory in the @INC set.  
 #
 package Devel::ptkdb ;
+
+##
+## do this check once, rather than repeating the string comparison again and again
+##
+
+
+my $isWin32 = $^O eq 'MSWin32' ;
 
 =head1 NAME
 
@@ -684,7 +694,7 @@ are supported, but the Balloons require Tk800 or higher.
 
 =head1 AUTHOR
 
-Andrew E. Page, aepage@ptkdb.sourceforge.net
+Andrew E. Page, aepage@users.sourceforge.net
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -879,14 +889,6 @@ sub BEGIN {
    $ENV{'DISPLAY'} = $ENV{'PTKDB_DISPLAY'} if exists $ENV{'PTKDB_DISPLAY'} ;
 
  } # end of BEGIN
-
-sub DESTROY {
-  my ($self) = @_ ;
-  
-  $self->save_bookmarks($self->{BookMarksPath}) if $Devel::ptkdb::DataDumperAvailable && $self->{'bookmarks_changed'};
-
-
-} # end of ptkdb::DESTROY
 
 ##
 ## subroutine provided to the user for initializing
@@ -1129,6 +1131,18 @@ sub setup_main_window {
 
 }
 
+#
+# Check for changes to the bookmarks and quit
+#
+sub DoQuit {
+	my($self) = @_ ;
+
+  $self->save_bookmarks($self->{BookMarksPath}) if $Devel::ptkdb::DataDumperAvailable && $self->{'bookmarks_changed'};
+	$self->{main_window}->destroy if $self->{main_window} ; 
+	$self->{main_window} = undef if defined $self->{main_window} ; 
+
+	exit ;
+}
 
 #
 # This supports the File -> Open menu item
@@ -1282,7 +1296,7 @@ sub setup_menu_bar {
              
              [ 'command' => 'Quit...', -accelerator => 'Alt+Q',
                -underline => 0,
-               -command => sub { exit } ]
+               -command => sub { $self->DoQuit } ]
              ] ;
 
                  
@@ -2717,8 +2731,8 @@ sub set_file {
   # call at time provides a MASSIVE savings in execution time.
   #
   $noCode = ($#dbline - ($offset + 1)) < 0 ;
+
   $text->insert('end', map {
-    
     #
     # build collections of tags representing
     # the line numbers for breakable and 
@@ -2729,8 +2743,11 @@ sub set_file {
     ($_ != 0 && push @breakableTagList, "$i.0", "$i.$len") || push @nonBreakableTagList, "$i.0", "$i.$len" ;
 
     $lineStr = sprintf($Devel::ptkdb::linenumber_format, $i++) . $_ ; # line number + text of the line
-    $lineStr .= "\n" unless /\n$/o ; # append a \n if there isn't one already
-    
+
+		substr $lineStr, -2, 1, '' if $isWin32 ; # removes the CR from win32 instances
+
+		$lineStr .= "\n" unless /\n$/o ; # append a \n if there isn't one already
+
     ($lineStr, 'code') ; # return value for block, a string,tag pair for text insert
     
   } @dbline[$offset+1 .. $#dbline] ) unless $noCode ;
@@ -2980,8 +2997,7 @@ sub main_loop {
    $evt =~ /step/o && do { last SWITCH ; } ;
    $evt =~ /null/o && do { next SWITCH ; } ;
    $evt =~ /run/o && do { last SWITCH ; } ;
-   $evt =~ /quit/o && do { $self->{main_window}->destroy if $self->{main_window} ; 
-                           $self->{main_window} = undef if defined $self->{main_window} ; exit ; } ;
+   $evt =~ /quit/o && do { $self->DoQuit ; } ;
    $evt =~ /expr/o && do { return $evt ; } ; # adds an expression to our expression window
    $evt =~ /qexpr/o && do { return $evt ; } ; # does a 'quick' expression
    $evt =~ /update/o && do { return $evt ; } ; # forces an update on our expression window
@@ -3186,7 +3202,7 @@ sub filterBreakPts {
 
 sub DoAbout {
   my $self = shift ;
-  my $str = "ptkdb $DB::VERSION\nCopyright 1998 by Andrew E. Page\nFeedback to aepage\@ptkdb.sourceforge.net\n\n" ;
+  my $str = "ptkdb $DB::VERSION\nCopyright 1998,2003 by Andrew E. Page\nFeedback to aepage\@users.sourceforge.net\n\n" ;
   my $threadString = "" ;
   
   $threadString = "Threads Available" if $Config::Config{usethreads} ;
@@ -3466,7 +3482,7 @@ package DB ;
 
 use vars '$VERSION', '$header' ;
 
-$VERSION = '1.1084' ;
+$VERSION = '1.1086' ;
 $header = "ptkdb.pm version $DB::VERSION";
 $DB::window->{current_file} = "" ;
 
@@ -4268,6 +4284,21 @@ sub DB {
 1 ; # return true value
 
 # $Log: ptkdb.pm,v $
+# Revision 1.11  2003/06/26 13:42:49  aepage
+# fix for chars at the end of win32 platforms.
+#
+# Revision 1.10  2003/05/12 14:38:34  aepage
+# win32 pushback
+#
+# Revision 1.9  2003/05/12 13:46:46  aepage
+# optmization of win32 line fixing
+#
+# Revision 1.8  2003/05/11 23:42:20  aepage
+# fix to remove stray win32 chars
+#
+# Revision 1.7  2003/05/11 23:15:26  aepage
+# email address changes, fixes for perl 5.8.0
+#
 # Revision 1.6  2002/11/28 19:17:43  aepage
 # Changed many options to widgets and pack from bareword or 'bareword'
 # to -bareword to support Tk804.024(Devel).
