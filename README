@@ -1,4 +1,7 @@
 
+1.1063  Menu initialization has been 'tuned' up a bit.   New handling for closure of window
+        and quit.  Beginning to deal with 'reused' addresses.
+
 1.1059  Corrected a bug where vars in the dbval subroutine could eclipse
         vars that were in targe code
 

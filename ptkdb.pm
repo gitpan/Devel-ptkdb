@@ -270,6 +270,12 @@ Devel::ptkdb - Perl debugger using a Tk GUI
 		Runs the script until it returns from the currently executing
 		subroutine.	 
 
+		=item Restart
+
+		Saves the breakpoints and expressions in a temporary file and restarts the script from the beginning.
+	CAUTION:   This feature will not work properly with debugging of CGI Scripts.
+
+
 		=head2 Data Menu
 
 		=item Enter Expression
@@ -770,7 +776,7 @@ sub DESTROY {
 	$self->save_bookmarks($self->{BookMarksPath}) if $Devel::ptkdb::DataDumperAvailable && $self->{'bookmarks_changed'};
 
 
-} # end of ptkdb1047::DESTROY
+} # end of ptkdb::DESTROY
 
 ##
 ## subroutine provided to the user for initializing
@@ -941,6 +947,21 @@ sub new {
 
 	$self->{'expr_list'} = [] ; # list of expressions to eval in our window fields:	 {'expr'} The expr itself {'depth'} expansion depth
 
+
+	$self->{'brkPtCnt'} = 0 ;
+	$self->{'brkPtSlots'} = [] ; # open slots for adding breakpoints to the table 
+
+	$self->{'main_window'} = undef ;
+
+	$self->setup_main_window() ;
+
+	return $self ;
+
+} # end of new
+
+sub setup_main_window {
+	my($self) = @_ ;
+
 	# Main Window
 	
 	$self->{main_window} = MainWindow->new() ;
@@ -953,7 +974,7 @@ sub new {
 	#
 	# Bind our 'quit' routine to a close command from the window manager (Alt-F4) 
 	# 
-	$self->{main_window}->protocol('WM_DELETE_WINDOW', sub { $DB::window->{'event'} = 'quit' } ) ;
+	$self->{main_window}->protocol('WM_DELETE_WINDOW', sub { $self->close_ptkdb_window() ; } ) ;
 
 	# Menu bar
 
@@ -966,12 +987,8 @@ sub new {
 
 	$self->setup_frames() ;
 
-	$self->{'brkPtCnt'} = 0 ;
-	$self->{'brkPtSlots'} = [] ; # open slots for adding breakpoints to the table 
+}
 
-	return $self ;
-
-} # end of new
 
 #
 # This supports the File -> Open menu item
@@ -989,6 +1006,7 @@ sub DoOpen {
 	#
 
 	my $chooseSub = sub { $selectedFile = $listBox->get('active') ;
+												print "attempting to open $selectedFile\n" ;
 											$DB::window->set_file($selectedFile, 0) ;
 												destroy $topLevel ; 
 											} ;
@@ -1060,10 +1078,19 @@ sub do_tabs {
  $DB::window->{'text'}->configure(-tabs => [ split /\s/, $tabs_str ]) ;
 }
 
+sub close_ptkdb_window {
+	my($self) = @_ ;
+
+	$DB::window->{'event'} = 'run' ;
+	$self->{current_file} = "" ; # force a file reset
+	$self->{'main_window'}->destroy ;
+	$self->{'main_window'} = undef ;
+}
+
 sub setup_menu_bar {
 	my ($self) = @_ ;
 	my $mw = $self->{main_window} ;
-	my $mb ;
+	my ($mb, $items) ;
 	
 	#
 	# We have menu items/features that are not available if the Data::DataDumper module
@@ -1078,172 +1105,113 @@ sub setup_menu_bar {
 
 	# file menu in menu bar
 
+	$items = [ [ 'command' => 'About...', -command => sub { $self->DoAbout() ; } ],
+						 "-",
+
+						 [ 'command' => 'Open', -accelerator => 'Alt+O',
+							 -underline => 0,
+							 -command => sub { $self->DoOpen() ; } ],
+
+						 [ 'command' => 'Save Config...', 
+							 -underline => 0,
+							 -command => \&DB::SaveState,
+							 @dataDumperEnableOpt ],
+
+						 [ 'command' => 'Restore Config...',
+							 -underline => 0,
+							 -command => \&DB::RestoreState,
+							 @dataDumperEnableOpt ],
+
+						 [ 'command' => 'Goto Line...',
+							 -underline => 0,
+							 -accelerator => 'Alt-g',
+							 -command => \&DB::RestoreState,
+							 @dataDumperEnableOpt ] ,
+
+						 [ 'command' => 'Find Text...',
+							 -accelerator => 'Ctrl-f',
+							 -underline => 0,
+							 -command => sub { $self->FindText() ; } ],
+
+						 [ 'command' => "Tabs...", -command => \&do_tabs ],
+
+						 "-",
+
+						 [ 'command' => 'Close Window and Run', -accelerator => 'Alt+W',
+							 -underline => 6, -command => sub { $self->close_ptkdb_window ; } ],
+						 
+						 [ 'command' => 'Quit...', -accelerator => 'Alt+Q',
+							 -underline => 0,
+							 -command => sub { exit } ]
+						 ] ;
+
+								 
+	$mw->bind('<Alt-g>' =>	sub { $self->GotoLine() ; }) ;
+	$mw->bind('<Control-f>' => sub { $self->FindText() ; }) ;
+	$mw->bind('<Control-r>' => \&Devel::ptkdb::DoRestart) ;
+	$mw->bind('<Alt-q>' => sub { $self->{'event'} = 'quit' } ) ;
+	$mw->bind('<Alt-w>' => sub { $self->close_ptkdb_window ; }) ;
+
 	$self->{file_menu_button} = $mb->Menubutton(text => 'File',
 																							underline => 0,
+																							-menuitems => $items
 																							)->pack(side =>, 'left',
 																											anchor => 'nw',
 																											'padx' => 2) ;
 
-	# About box
-	
-
-	$self->{file_menu_button}->command(-label => 'About...',
-																		 command => sub { $self->DoAbout() ; } # we do an extra sub level for future AUTOLOADING work
-																		 ) ;
-
-	$self->{file_menu_button}->separator() ;
-
-	# open item in menu bar
-
-	$self->{open_button} = $self->{file_menu_button}->command(-label => 'Open',
-																														-accelerator => 'Alt+O',
-																														underline => 0,
-																														command => sub { $self->DoOpen() ; }
-																														) ;
-	$mw->bind('<Alt-o>' =>	sub { $self->DoOpen() ; } ) ;
-
-	# Save Breakpoints and Expressions (Enabled only if Data::Dumper is available)
-
-
-	$self->{save_brks_and_exprs} = $self->{file_menu_button}->command( -label => 'Save Config...',
-																																		 underline => 0,
-																																		 command => \&DB::SaveState,
-																																		 @dataDumperEnableOpt) ;
-
-	$self->{restore_brks_and_exprs} = $self->{file_menu_button}->command( -label => 'Restore Config...',
-																																				underline => 0,
-																																				command => \&DB::RestoreState,
-																																				@dataDumperEnableOpt) ;
-	
-	# Goto line
-
-	$self->{goto_line_button} = $self->{file_menu_button}->command(-label => 'Goto Line...',
-																																 -accelerator => 'Alt+g',
-																																 underline => 0,
-																																 command => sub { $self->GotoLine() ; }
-																																 ) ;
-
-	$mw->bind('<Alt-g>' =>	sub { $self->GotoLine() ; }) ;
-
-
-	# Find Text
-
-	$self->{find_text_button} = $self->{file_menu_button}->command(-label => 'Find Text...',
-																																 -accelerator => 'Ctrl+f',
-																																 underline => 0,
-																																 -command => sub { $self->FindText() ; }
-																																 ) ;
-
-	$mw->bind('<Control-f>' => sub { $self->FindText() ; }) ;
-
-	$self->{file_menu_button}->separator() ;
-
-	$self->{file_menu_button}->command(-label => "Tabs...",
-																		 -command => \&do_tabs) ;
-
-
-	# quit item in menu bar
-
-	$self->{file_menu_button}->separator() ;
-
-	$self->{file_menu_button}->command(-label => "Restart...",
-																		 -command => \&Devel::ptkdb::DoRestart) ;
-
-	$mw->bind('<Control-r>' => \&Devel::ptkdb::DoRestart) ;
-
-	$self->{file_menu_button}->separator() ;
-
-	$self->{quit_button} = $self->{file_menu_button}->command(-label => 'Quit',
-																														-accelerator => 'Alt+Q',
-																														underline => 0,
-																														command => sub { $self->{'event'} = 'quit' }
-																														) ;
-
-	$mw->bind('<Alt-q>' => sub { $self->{'event'} = 'quit' } );
-
 	# Control Menu
-
-	
-	$self->{control_menu_button} = $mb->Menubutton(text => 'Control',
-																								 underline => 0,
-																								 )->pack(side =>, 'left',
-																												 'padx' => 2) ;
-
-	# Run
 
 	my $runSub = sub { $DB::step_over_depth = -1 ; $self->{'event'} = 'run' } ;
 
-	$self->{control_menu_button}->command(-label => 'Run',
-																				-accelerator => 'Alt+r',
-																				underline => 0,
-																				command => $runSub
-																				) ;
-
-	$mw->bind('<Alt-r>' => $runSub) ;
-
-	# Run to
-
 	my $runToSub = sub { $DB::window->{'event'} = 'run' if	$DB::window->SetBreakPoint(1) ; } ;
-
-	$self->{control_menu_button}->command(-label => 'Run To Here',
-																				-accelerator => 'Alt+t',
-																				underline => 5,
-																				command => $runToSub
-																				) ;
-
-	$mw->bind('<Alt-t>', $runToSub) ;
-
-
-	# Set BrkPt
-
-	$self->{control_menu_button}->separator() ;
-
-	$self->{set_breakpoint_button} = $self->{control_menu_button}->command(-label => "Set Breakpoint",
-																																				 -underline => 4,
-																																				 command => sub { $self->SetBreakPoint ; }
-																																				 ) ;
-
-	# Clear BrkPt
-
-	$self->{clr_breakpoint_button} = $self->{control_menu_button}->command(-label => "Clear Breakpoint",
-																																				 command => sub { $self->UnsetBreakPoint }
-																																				 ) ;
-
-	# Clear All Breakpoints
-
-	$self->{clr_all_breakpoints_button} = $self->{control_menu_button}->command(-label => "Clear All Breakpoints",
-																																							-underline => 6,
-																																							command => sub {			
-																																							$DB::window->removeAllBreakpoints($DB::window->{current_file}) ;
-																																								&DB::clearalldblines() ;
-																																							}
-																																							) ;
-
-	$self->{control_menu_button}->separator() ;
-	
-	# Step Over
 
 	my $stepOverSub = sub { &DB::SetStepOverBreakPoint(0) ; 
 												$DB::single = 1 ; 
 												$DB::window->{'event'} = 'step' ; } ;
-
-	$self->{step_over_menu_button} = $self->{control_menu_button}->command(-label => "Step Over",
-																																				 -accelerator => 'Alt+N',
-																																				 -underline => 0,
-																																				 command => $stepOverSub
-																																				 ) ;
-	# Step In
+	
 
 	my $stepInSub = sub { 
-	$DB::step_over_depth = -1 ; 
-	$DB::single = 1 ; 
-	$DB::window->{'event'} = 'step' ; } ;
+	                    $DB::step_over_depth = -1 ; 
+	                    $DB::single = 1 ; 
+	                    $DB::window->{'event'} = 'step' ; } ;
+
+
+	my $returnSub =	 sub { 
+		&DB::SetStepOverBreakPoint(-1) ;
+		$self->{'event'} = 'run' ;
+	} ;
+
+
+	$items = [ [ 'command' => 'Run', -accelerator => 'Alt+r', underline => 0, -command => $runSub ],
+						 [ 'command' => 'Run To Here', -accelerator => 'Alt+t', -underline => 5, -command => $runToSub ],
+						 '-',
+						 [ 'command' =>  'Set Breakpoint', -underline => 4, -command => sub { $self->SetBreakPoint ; } ],
+						 [ 'command' => 'Clear Breakpoint', -command => sub { $self->UnsetBreakPoint } ],
+						 [ 'command' => 'Clear All Breakpoints', -underline => 6, -command => sub {			
+						 $DB::window->removeAllBreakpoints($DB::window->{current_file}) ;
+							 &DB::clearalldblines() ;
+						 } ],
+						 '-',
+						 [ 'command' => 'Step Over', -accelerator => 'Alt+N', -underline => 0, -command => $stepOverSub ],
+						 [ 'command' => 'Step In', -accelerator => 'Alt+S', -underline => 5, -command => $stepInSub ],
+						 [ 'command' => 'Return', -accelerator => 'Alt+U', -underline => 3, -command => $returnSub ],
+						 '-',
+						 [ 'command' => 'Restart...', -accelerator => 'Ctrl-r', -underline => 0, -command => \&Devel::ptkdb::DoRestart ],
+
+						 
+							 ] ; # end of control menu items
+
 	
-	$self->{step_in_menu_button} = $self->{control_menu_button}->command(-label => "Step In",
-																																			 -accelerator => 'Alt+S',
-																																			 -underline => 5,
-																																			 command => $stepInSub
-																																			 ) ;
+	$self->{control_menu_button} = $mb->Menubutton(text => 'Control',
+																								 -underline => 0,
+																								 -menuitems => $items,
+																								 )->pack(side =>, 'left',
+																												 'padx' => 2) ;
+
+
+	$mw->bind('<Alt-r>' => $runSub) ;
+	$mw->bind('<Alt-t>', $runToSub) ;
+
 	for( @Devel::ptkdb::step_over_keys ) {
 		$mw->bind($_ => $stepOverSub );
 	}
@@ -1252,70 +1220,31 @@ sub setup_menu_bar {
 		$mw->bind($_ => $stepInSub );
 	}
 
-
-	# Return
-
-	my $returnSub =	 sub { 
-		&DB::SetStepOverBreakPoint(-1) ;
-		$self->{'event'} = 'run' ;
-	} ;
-
-	$self->{return_menu_button} = $self->{control_menu_button}->command(-label => "Return",
-																																			-accelerator => 'Alt+U',
-																																			-underline => 3,
-																																			command => $returnSub
-																																			) ;
-
 	for( @Devel::ptkdb::return_keys ) {
 		$mw->bind($_ => $returnSub );
 	}
 
 	# Data Menu
 
-	$self->{data_menu_button} = $mb->Menubutton(text => 'Data',
+	$items = [ [ 'command' => 'Enter Expression', -accelerator => 'Alt+E', -command => sub { $self->EnterExpr() } ],
+						 [ 'command' => 'Delete Expression', -accelerator => 'Ctrl+D', -command => sub { $self->deleteExpr() } ],
+						 [ 'command' => 'Delete All Expressions',  -command => sub { 
+																			 $self->deleteAllExprs() ;
+																			 $self->{'expr_list'} = [] ; # clears list by dropping ref to it, replacing it with a new one	 
+																		 } ],
+						 '-',
+						 [ 'command' => 'Expression Eval Window...', -accelerator => 'F8', -command => sub { $self->setupEvalWindow() ; } ],
+						 [ 'checkbutton' => "Use DataDumper for Eval Window?", -variable => \$Devel::ptkdb::useDataDumperForEval, @dataDumperEnableOpt ]
+							] ;
+
+
+	$self->{data_menu_button} = $mb->Menubutton(text => 'Data', -menuitems => $items,
 																							underline => 0,
 																							)->pack(side => 'left',
 																											'padx' => 2) ;
 
-	# Enter expression
-
-	$self->{enter_expr_menu_button} = $self->{data_menu_button}->command(-label => "Enter Expression",
-																																			 -accelerator => 'Alt+E',
-																																			 command => sub { $self->EnterExpr() }
-																																			 ) ;
-
 	$mw->bind('<Alt-e>' => sub { $self->EnterExpr() } ) ;
-
-	# Delete an Expression
-
-	$self->{data_menu_button}->command(-label => "Delete Expression",
-																		 -accelerator => 'Ctrl+D',
-																		 command => sub { $self->deleteExpr() }
-																		 ) ;
 	$mw->bind('<Control-d>' => sub { $self->deleteExpr() } );
-
-	# Delete All Expressions
-
-	$self->{data_menu_button}->command(-label => "Delete All Expressions",
-																		 command => sub { 
-																			 $self->deleteAllExprs() ;
-																			 $self->{'expr_list'} = [] ; # clears list by dropping ref to it, replacing it with a new one	 
-																		 }
-																		 ) ;
-
-	# Expression Eval window
-
-	$self->{data_menu_button}->separator() ;
-	$self->{data_menu_button}->command(-label => "Expression Eval Window...",
-																		 -accelerator => 'F8',
-																		 command => sub { $self->setupEvalWindow() ; }
-																		 ) ;
-
-	$self->{data_menu_button}->checkbutton(-label => "Use DataDumper for Eval Window?",
-																				 variable => \$Devel::ptkdb::useDataDumperForEval,
-																				 @dataDumperEnableOpt) ;
-	
-
 	$mw->bind('<F8>', sub { $self->setupEvalWindow() ; }) ;
 	#
 	# Stack menu
@@ -2369,8 +2298,8 @@ sub fixExprPath {
 # Returns 1 if sucessfully added 0 if not
 #
 sub insertExpr {
-	my($self, $dl, $topRef, $name, $depth, $dirPath) = @_ ;
-	my($theRef, $label, $type, $result) ;
+	my($self, $reusedRefs, $dl, $topRef, $name, $depth, $dirPath) = @_ ;
+	my($theRef, $label, $type, $result, $saveW, $selfCnt) ;
 
 	#
 	# Add data new data entries to the bottom
@@ -2379,6 +2308,7 @@ sub insertExpr {
 
 	$theRef = $topRef ;
 	$label = "" ;
+	$selfCnt = 0 ;
 
 	while( ref $theRef eq 'SCALAR' ) {
 		$theRef = $$theRef ;
@@ -2392,7 +2322,7 @@ sub insertExpr {
  }
 
 	if( !$type || $type eq "" || $type eq "GLOB" || $type eq "CODE") {
-		my $saveW = $^W ;
+		$saveW = $^W ;
 		$^W = 0 ;
 		eval {
 			if( !defined $theRef ) {
@@ -2418,7 +2348,23 @@ sub insertExpr {
 		}
 		$result = 1 ;
 		foreach $r ( @{$theRef} ) {
-			$result = $self->insertExpr($dl, $r, "[$idx]", $depth-1, $dirPath . fixExprPath($name) . $Devel::ptkdb::pathSep) unless $depth == 0 ;
+
+			$saveW = $^W ;
+			
+			if( grep $_ == $r, @$reusedRefs ) { # check to make sure that we're not doing a single level self reference
+				eval {
+					$dl->add($dirPath .  fixExprPath($name) . $Devel::ptkdb::pathSep . "__ptkdb_self_path" . $selfCnt++, -text => "[$idx] = $r REUSED ADDR") ;
+				} ;
+				$self->DoAlert($@) if( $@ ) ;
+				next ;
+			}
+			
+			$^W = 0 ;
+
+			push @$reusedRefs, $r ;
+			$result = $self->insertExpr($reusedRefs, $dl, $r, "[$idx]", $depth-1, $dirPath . fixExprPath($name) . $Devel::ptkdb::pathSep) unless $depth == 0 ;
+			pop @$reusedRefs ;
+
 			return 0 unless $result ;
 			$idx += 1 ;
 		}
@@ -2445,16 +2391,37 @@ sub insertExpr {
 	@theKeys = sort keys %{$theRef} ;
 	$dl->add($dirPath . $name, -text => "$name = $theRef") ;
 	$result = 1 ;
+
 	foreach $r ( @$theRef{@theKeys} ) { # slice out the values with the sorted list
-		$result = $self->insertExpr($dl, # data list widget
-																$r, # refrence whose value is displayed
-																$theKeys[$idx], # name
-																$depth-1, # remaining expansion depth
+
+		$saveW = $^W ;
+	 
+		if( grep $_ == $r, @$reusedRefs ) { # check to make sure that we're not doing a single level self reference
+			eval {
+				$dl->add($dirPath .  fixExprPath($name) . $Devel::ptkdb::pathSep . "__ptkdb_self_path" . $selfCnt++, -text => "$theKeys[$idx++] = $r REUSED ADDR") ;
+			} ;
+			print "bad path $@\n" if( $@ ) ;
+			next ;
+		}
+
+		$^W = 0 ;
+
+		push @$reusedRefs, $r ;
+
+		$result = $self->insertExpr($reusedRefs,                              # recursion protection
+																$dl,                                      # data list widget
+																$r,                                       # reference whose value is displayed
+																$theKeys[$idx],                           # name
+																$depth-1,                                 # remaining expansion depth
 																$dirPath . $name . $Devel::ptkdb::pathSep # path to add to
 																) unless $depth == 0 ;
+
+		pop @$reusedRefs ;
+
 		return 0 unless $result ;
 		$idx += 1 ;
 	} # end of ref add loop
+
 	return 1 ;
 } # end of insertExpr
 
@@ -2485,14 +2452,19 @@ sub set_line {
 # $brkPts any breakpoints that may have been set in this file
 #
 
+use Carp ;
+
 sub set_file {
 	my ($self, $fname, $line) = @_ ;
 	my ($lineStr, $offset, $text, $i, @text) ;
 	my (@breakableTagList, @nonBreakableTagList) ;
+
+	return unless $fname ;  # we're getting an undef here on 'Restart...'
+
 	local(*dbline) = $main::{'_<' . $fname};
 
 	#
-	# with the #! /usr/bin/perl -d:ptkdb1047 at the header of the file
+	# with the #! /usr/bin/perl -d:ptkdb at the header of the file
 	# we've found that with various combinations of other options the
 	# files haven't come in at the right offsets
 	#
@@ -3269,7 +3241,7 @@ package DB ;
 
 use vars '$VERSION', '$header' ;
 
-$VERSION = '1.1061restart' ;
+$VERSION = '1.1064' ;
 $header = "ptkdb.pm version $DB::VERSION";
 $DB::window->{current_file} = "" ;
 
@@ -3295,10 +3267,10 @@ sub updateExprs {
 		@result = &DB::dbeval($package, $expr->{'expr'}) ;
 
 		if( scalar @result == 1 ) {
-		$DB::window->insertExpr($DB::window->{'data_list'}, $result[0], $expr->{'expr'}, $expr->{'depth'}) ;
+		$DB::window->insertExpr([ $result[0] ], $DB::window->{'data_list'}, $result[0], $expr->{'expr'}, $expr->{'depth'}) ;
 		}
 		else {
-		$DB::window->insertExpr($DB::window->{'data_list'}, \@result, $expr->{'expr'}, $expr->{'depth'}) ;
+		$DB::window->insertExpr([ \@result ], $DB::window->{'data_list'}, \@result, $expr->{'expr'}, $expr->{'depth'}) ;
 		}
 	}
 
@@ -3309,9 +3281,14 @@ no strict ; # turning strict off (shame shame) because we keep getting errrs for
 #
 # returns true if line is breakable
 #
-
+use Carp ;
 sub checkdbline($$) { 
 	my ($fname, $lineno) = @_ ;
+
+	return 0 unless $fname; # we're getting an undef here on 'Restart...'
+
+	carp "check dbline on $fname" ;
+
 	local(*dbline) = $main::{'_<' . $fname} ;
 
 	my $saveW = $^W ;
@@ -3834,6 +3811,9 @@ sub DB {
 		 return ;
 	 }
 
+ $DB::window->setup_main_window() unless $DB::window->{'main_window'} ;
+
+
 
  $DB::window->EnterActions() ; 
 
@@ -3939,10 +3919,10 @@ sub DB {
 					 @result = &DB::dbeval($package, $DB::window->{expr}) ;
 
 					 if( scalar @result == 1 ) {
-						 $r = $DB::window->insertExpr($DB::window->{'data_list'}, $result[0], $DB::window->{'expr'}, $Devel::ptkdb::expr_depth) ;
+						 $r = $DB::window->insertExpr([ $result[0] ], $DB::window->{'data_list'}, $result[0], $DB::window->{'expr'}, $Devel::ptkdb::expr_depth) ;
 					 }
 					 else {
-						 $r = $DB::window->insertExpr($DB::window->{'data_list'}, \@result, $DB::window->{'expr'}, $Devel::ptkdb::expr_depth)	 ;
+						 $r = $DB::window->insertExpr([ \@result ], $DB::window->{'data_list'}, \@result, $DB::window->{'expr'}, $Devel::ptkdb::expr_depth)	 ;
 					 }
 
 					 #
