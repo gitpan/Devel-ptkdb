@@ -1,4 +1,9 @@
 
+1.1067  Fixed a problem where ptkdb would not evaluate an expression such as 'keys %hash' in
+	its expression window.
+
+	Fixed some problems with balloons coordinate system and made them respond faster.
+
 1.1063  Menu initialization has been 'tuned' up a bit.   New handling for closure of window
         and quit.  Beginning to deal with 'reused' addresses.
 

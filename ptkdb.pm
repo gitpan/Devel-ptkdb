@@ -599,7 +599,7 @@ to
  #! /usr/local/bin/perl -d:ptkdb
 
 TIP: You can debug scripts remotely if you're using a unix based
-		server and where you are authoring the script has an Xserver.	 The
+		Xserver and where you are authoring the script has an Xserver.	 The
 		Xserver can be another unix workstation, a Macintosh or Win32 platform
 		with an appropriate XWindows package.	 In your script insert the
 		following BEGIN subroutine:
@@ -1822,7 +1822,13 @@ sub setup_frames {
 																 @Devel::ptkdb::code_text_font
 																	 ) ;
 
+
 	$txt = $self->{'text'} ;
+	for( $txt->children ) {
+		next unless (ref $_) =~ /ROText$/ ;
+		$self->{'text'} = $_ ;
+		last ;
+	}
 
 	$frm->packPropagate(0) ;
 	$txt->packPropagate(0) ;
@@ -1917,7 +1923,7 @@ sub configure_text {
 	
 	$self->{'expr_ballon_msg'} = ' ' ;
 	
-	$self->{'expr_balloon'}->attach($txt, -initwait => 1000,
+	$self->{'expr_balloon'}->attach($txt, -initwait => 300,
 																	-msg => \$self->{'expr_ballon_msg'},
 																	-balloonposition => 'mouse',
 																	-postcommand => \&Devel::ptkdb::balloon_post,
@@ -3177,8 +3183,8 @@ sub retrieve_text_expr {
 	# if we're sitting over white space, leave
 	my $len = length $data ;
 	return unless $data && $col && $len > 0 ;
-	return if substr($data, $col, 1) =~ /\s/ ;
 
+	return if substr($data, $col, 1) =~ /\s/ ;
 
 	# walk backwards till we find some whitespace
 
@@ -3187,13 +3193,9 @@ sub retrieve_text_expr {
 		last if	 substr($data, $col, 1) =~ /[\s\$\@\%]/ ;
 	}
 
-	substr($data, $col) =~ /^([\$\@\%a-zA-Z0-9_]+)/ ;
+	substr($data, $col) =~ /^([\$\@\%][a-zA-Z0-9_]+)/ ;
 
-	return unless $1 ;
-
-	$data = $1 ;
-
-	return $data ;
+	return $1 ;
 }
 
 #
@@ -3322,7 +3324,7 @@ package DB ;
 
 use vars '$VERSION', '$header' ;
 
-$VERSION = '1.1066' ;
+$VERSION = '1.1067' ;
 $header = "ptkdb.pm version $DB::VERSION";
 $DB::window->{current_file} = "" ;
 
@@ -3835,7 +3837,8 @@ sub dbeval {
 	# An expression of %hash results in a
 	# list of key/value pairs.	
 	#
-	$ptkdb__expr =~ s/\s*%/\\%/o ;
+
+	$ptkdb__expr =~ s/^\s*%/\\%/o ;
 
 	@ptkdb__result = eval <<__EVAL__ ;
 
