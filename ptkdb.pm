@@ -1179,7 +1179,7 @@ sub DoOpen {
   $listBox = $topLevel->Scrolled('Listbox', 
                                @Devel::ptkdb::scrollbar_cfg,
                                @Devel::ptkdb::expression_text_font,
-                                 'width' => 30)->pack(side => 'top', fill => 'both', -expand => 1) ;
+                                 'width' => 30)->pack(-side => 'top', -fill => 'both', -expand => 1) ;
 
 
   # Bind a double click on the mouse button to the same action
@@ -1190,10 +1190,10 @@ sub DoOpen {
   $listBox->insert('end', @fList) ;
 
   $topLevel->Button( text => "Okay", -command => $chooseSub, @Devel::ptkdb::button_font,
-                     )->pack(side => 'left', fill => 'both', -expand => 1) ;
+                     )->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 
   $topLevel->Button( text => "Cancel", @Devel::ptkdb::button_font,
-                     -command => sub { destroy $topLevel ; } )->pack(side => 'left', fill => 'both', -expand => 1) ;
+                     -command => sub { destroy $topLevel ; } )->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 } # end of DoOpen
 
 sub do_tabs {
@@ -1239,7 +1239,7 @@ sub setup_menu_bar {
   my @dataDumperEnableOpt = ( state => 'disabled' ) unless $Devel::ptkdb::DataDumperAvailable ;
 
 
-  $self->{menu_bar} = $mw->Frame(-relief => 'raised', -borderwidth => '1')->pack(side => 'top', -fill => 'x') ;
+  $self->{menu_bar} = $mw->Frame(-relief => 'raised', -borderwidth => '1')->pack(-side => 'top', -fill => 'x') ;
 
   $mb = $self->{menu_bar} ;
 
@@ -1292,12 +1292,12 @@ sub setup_menu_bar {
   $mw->bind('<Alt-q>' => sub { $self->{'event'} = 'quit' } ) ;
   $mw->bind('<Alt-w>' => sub { $self->close_ptkdb_window ; }) ;
 
-  $self->{file_menu_button} = $mb->Menubutton(text => 'File',
-                                              underline => 0,
+  $self->{file_menu_button} = $mb->Menubutton(-text => 'File',
+                                              -underline => 0,
                                               -menuitems => $items
-                                              )->pack(side =>, 'left',
-                                                      anchor => 'nw',
-                                                      'padx' => 2) ;
+                                              )->pack(-side =>, 'left',
+                                                      -anchor => 'nw',
+                                                      -padx => 2) ;
 
   # Control Menu
 
@@ -1323,7 +1323,7 @@ sub setup_menu_bar {
   } ;
 
 
-  $items = [ [ 'command' => 'Run', -accelerator => 'Alt+r', underline => 0, -command => $runSub ],
+  $items = [ [ 'command' => 'Run', -accelerator => 'Alt+r', -underline => 0, -command => $runSub ],
              [ 'command' => 'Run To Here', -accelerator => 'Alt+t', -underline => 5, -command => $runToSub ],
              '-',
              [ 'command' =>  'Set Breakpoint', -underline => 4, -command => sub { $self->SetBreakPoint ; }, -accelerator => 'Ctrl-b' ],
@@ -1345,11 +1345,11 @@ sub setup_menu_bar {
                ] ; # end of control menu items
 
   
-  $self->{control_menu_button} = $mb->Menubutton(text => 'Control',
+  $self->{control_menu_button} = $mb->Menubutton(-text => 'Control',
                                                  -underline => 0,
                                                  -menuitems => $items,
-                                                 )->pack(side =>, 'left',
-                                                         'padx' => 2) ;
+                                                 )->pack(-side =>, 'left',
+                                                         -padx => 2) ;
 
 
   $mw->bind('<Alt-r>' => $runSub) ;
@@ -1382,10 +1382,10 @@ sub setup_menu_bar {
               ] ;
 
 
-  $self->{data_menu_button} = $mb->Menubutton(text => 'Data', -menuitems => $items,
-                                              underline => 0,
-                                              )->pack(side => 'left',
-                                                      'padx' => 2) ;
+  $self->{data_menu_button} = $mb->Menubutton(-text => 'Data', -menuitems => $items,
+                                              -underline => 0,
+                                              )->pack(-side => 'left',
+                                                      -padx => 2) ;
 
   $mw->bind('<Alt-e>' => sub { $self->EnterExpr() } ) ;
   $mw->bind('<Control-d>' => sub { $self->deleteExpr() } );
@@ -1393,19 +1393,19 @@ sub setup_menu_bar {
   #
   # Stack menu
   #
-  $self->{stack_menu} = $mb->Menubutton(text => 'Stack',
-                                        underline => 2,
-                                        )->pack(side => 'left',
-                                                'padx' => 2) ;
+  $self->{stack_menu} = $mb->Menubutton(-text => 'Stack',
+                                        -underline => 2,
+                                        )->pack(-side => 'left',
+                                                -padx => 2) ;
 
   #
   # Bookmarks menu
   #
-  $self->{bookmarks_menu} = $mb->Menubutton('text' => 'Bookmarks',
-                                            underline => 0,
+  $self->{bookmarks_menu} = $mb->Menubutton(-text => 'Bookmarks',
+                                            -underline => 0,
                                             @dataDumperEnableOpt
                                             )->pack(-side => 'left',
-                                                    'padx' => 2) ;
+                                                    -padx => 2) ;
   $self->setup_bookmarks_menu() ;
 
   #
@@ -1420,7 +1420,7 @@ sub setup_menu_bar {
              [ 'command' => 'Expr Entry', -accelerator => 'F11', -command => $dsub ]
              ] ;
 
-  $mb->Menubutton('text' => 'Windows', -menuitems => $items
+  $mb->Menubutton(-text => 'Windows', -menuitems => $items
                   )->pack(-side => 'left',
                           -padx => 2) ;
 
@@ -1432,7 +1432,7 @@ sub setup_menu_bar {
   # Bar for some popular controls
   #
 
-  $self->{button_bar} = $mw->Frame()->pack(side => 'top') ;
+  $self->{button_bar} = $mw->Frame()->pack(-side => 'top') ;
 
   $self->{stepin_button} = $self->{button_bar}->Button(-text, => "Step In", @Devel::ptkdb::button_font,
                                                        -command => $stepInSub) ;
@@ -1873,7 +1873,7 @@ sub setup_subs_page {
 
   $self->fill_subs_page() ;
 
-  $self->{'sub_list'}->pack(side => 'left', fill => 'both', expand => 1
+  $self->{'sub_list'}->pack(-side => 'left', -fill => 'both', -expand => 1
                             ) ;
 
   $self->{'subs_list_cnt'} = scalar keys %DB::sub ;
@@ -1906,17 +1906,17 @@ sub setup_search_panel {
 
   $frm = $parent->Frame() ;
 
-  $frm->Button(-text => 'Goto', -command => sub { $self->DoGoto($entry) })->pack(side => 'left') ;
+  $frm->Button(-text => 'Goto', -command => sub { $self->DoGoto($entry) })->pack(-side => 'left') ;
   $srchBtn = $frm->Button(-text => 'Search', -command => sub { $self->FindSearch($entry, $srchBtn, 0) ; }
-                          )->pack(side => 'left' ) ;
+                          )->pack(-side => 'left' ) ;
 
   $regexBtn = $frm->Button(-text => 'Regex',
                            -command => sub { $self->FindSearch($entry, $regexBtn, 1) ; }
-                           )->pack(side => 'left',
+                           )->pack(-side => 'left',
                                    ) ;
 
 
-  $entry = $frm->Entry(width => 50)->pack(side => 'left', fill => 'both', expand => 1) ;
+  $entry = $frm->Entry(-width => 50)->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 
   $entry->bind('<Return>', sub { check_search_request($entry, $self, $srchBtn, $regexBtn) ; } ) ;
 
@@ -1931,7 +1931,7 @@ sub setup_breakpts_page {
   $self->{'breakpts_page'} = $self->{'notebook'}->add("brkptspage", -label => "BrkPts") ;
 
   $self->{'breakpts_table'} = $self->{'breakpts_page'}->Table(-columns => 1, -scrollbars => 'se')->
-      pack(side => 'top', fill => 'both', expand => 1
+      pack(-side => 'top', -fill => 'both', -expand => 1
            )   ;
 
   $self->{'breakpts_table_data'} = { } ; # controls addressed by "fname:lineno"
@@ -1957,7 +1957,7 @@ sub setup_frames {
   $mw->update ; # force geometry manager to map main_window
   $frm = $mw->Frame(-width => $mw->reqwidth()) ; # frame for our code pane and search controls
 
-  $self->setup_search_panel($frm, side => 'top', fill => 'x') ;
+  $self->setup_search_panel($frm, -side => 'top', -fill => 'x') ;
 
   #
   # Text window for the code of our currently viewed file
@@ -1979,8 +1979,8 @@ sub setup_frames {
   $frm->packPropagate(0) ;
   $txt->packPropagate(0) ;
 
-  $frm->packAdjust(side => $codeSide, fill => 'both', expand => 1) ;
-  $txt->pack(side => 'left', fill => 'both', expand => 1) ;
+  $frm->packAdjust(-side => $codeSide, -fill => 'both', -expand => 1) ;
+  $txt->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 
   # $txt->form(-top => [ $self->{'menu_bar'} ], -left => '%0', -right => '%50') ;
   # $frm->form(-top => [ $self->{'menu_bar'} ], -left => '%50', -right => '%100') ;
@@ -1993,7 +1993,7 @@ sub setup_frames {
 
   $self->{'notebook'} = $mw->NoteBook() ;
   $self->{'notebook'}->packPropagate(0) ;
-  $self->{'notebook'}->pack(side => $codeSide, fill => 'both', -expand => 1) ;
+  $self->{'notebook'}->pack(-side => $codeSide, -fill => 'both', -expand => 1) ;
 
   #
   # an hlist for the data entries
@@ -2003,11 +2003,11 @@ sub setup_frames {
   #
   # frame, entry and label for quick expressions
   #
-  my $frame = $self->{'data_page'}->Frame()->pack(side => 'top', fill => 'x') ;
+  my $frame = $self->{'data_page'}->Frame()->pack(-side => 'top', -fill => 'x') ;
   
-  my $label = $frame->Label('text' => "Quick Expr:")->pack(side => 'left') ;
+  my $label = $frame->Label(-text => "Quick Expr:")->pack(-side => 'left') ;
   
-  $self->{'quick_entry'} = $frame->Entry()->pack(side => 'left', fill => 'x', -expand => 1) ;
+  $self->{'quick_entry'} = $frame->Entry()->pack(-side => 'left', -fill => 'x', -expand => 1) ;
 
   $self->{'quick_entry'}->bind('<Return>', sub { $self->QuickExpr() ; } ) ;
   
@@ -2015,11 +2015,11 @@ sub setup_frames {
   #
   # Entry widget for expressions and breakpoints
   #
-  $frame = $self->{'data_page'}->Frame()->pack(side => 'top', fill => 'x') ;
+  $frame = $self->{'data_page'}->Frame()->pack(-side => 'top', -fill => 'x') ;
 
-  $label = $frame->Label('text' => "Enter Expr:")->pack(side => 'left') ;
+  $label = $frame->Label(-text => "Enter Expr:")->pack(-side => 'left') ;
 
-  $self->{'entry'} = $frame->Entry()->pack(side => 'left', fill => 'x', -expand => 1) ;
+  $self->{'entry'} = $frame->Entry()->pack(-side => 'left', -fill => 'x', -expand => 1) ;
 
   $self->{'entry'}->bind('<Return>', sub { $self->EnterExpr() }) ;
 
@@ -2036,7 +2036,7 @@ sub setup_frames {
                                                       -selectmode => 'multiple'
                                                       ) ;
 
-  $self->{data_list}->pack(side => 'top', fill => 'both', expand => 1
+  $self->{data_list}->pack(-side => 'top', -fill => 'both', -expand => 1
                            ) ;
 
 
@@ -2129,9 +2129,9 @@ sub DoAlert {
 
   $dlg = $self->{main_window}->Toplevel(-title => $title || "Alert", -overanchor => 'cursor') ;
 
-  $dlg->Label( 'text' => $msg )->pack( side => 'top' ) ;
+  $dlg->Label( -text => $msg )->pack( -side => 'top' ) ;
 
-  $dlg->Button( 'text' => "Okay", -command => $okaySub )->pack( side => 'top' )->focus   ;
+  $dlg->Button( -text => "Okay", -command => $okaySub )->pack( -side => 'top' )->focus   ;
   $dlg->bind('<Return>', $okaySub) ;
 
 } # end of DoAlert
@@ -2144,14 +2144,14 @@ sub simplePromptBox {
 
  $Devel::ptkdb::promptString = $defaultText ;
 
-  $entry = $top->Entry('-textvariable' => 'Devel::ptkdb::promptString')->pack('side' => 'top', fill => 'both', -expand => 1) ;
+  $entry = $top->Entry('-textvariable' => 'Devel::ptkdb::promptString')->pack(-side => 'top', -fill => 'both', -expand => 1) ;
   
   
   $okayBtn = $top->Button( text => "Okay", @Devel::ptkdb::button_font, -command => sub {  &$okaySub() ; $top->destroy ;}
-                           )->pack(side => 'left', fill => 'both', -expand => 1) ;
+                           )->pack(-side => 'left', -fill => 'both', -expand => 1) ;
   
   $top->Button( text => "Cancel", -command => sub { &$cancelSub() if $cancelSub ; $top->destroy() }, @Devel::ptkdb::button_font,
-                )->pack(side => 'left', fill => 'both', -expand => 1) ;
+                )->pack(-side => 'left', -fill => 'both', -expand => 1) ;
   
   $entry->icursor('end') ;
   
@@ -2267,29 +2267,29 @@ sub add_brkpt_to_brkpt_page {
   # take the last leaf of the pathname 
   
   $frm = $self->{'breakpts_table'}->Frame(-relief => 'raised') ; 
-  $upperFrame = $frm->Frame()->pack('side' => 'top', '-fill' => 'x', 'expand' => 1) ; 
+  $upperFrame = $frm->Frame()->pack(-side => 'top', '-fill' => 'x', 'expand' => 1) ; 
 
   
   $btn = $upperFrame->Checkbutton(-text => "$btnName:$index",
                                   -variable => \$brkPt->{'value'}, # CAUTION value tracking
                                   -command => sub { $self->brkPtCheckbutton($fname, $index, $brkPt) }) ;
 
-  $btn->pack(side => 'left') ;
+  $btn->pack(-side => 'left') ;
 
   $btn = $upperFrame->Button(-text => "Delete", -command => sub { $self->removeBreakpoint($fname, $index) ; } ) ;
-  $btn->pack('side' => 'left', -fill => 'x', -expand => 1) ;
+  $btn->pack(-side => 'left', -fill => 'x', -expand => 1) ;
   
   $btn = $upperFrame->Button(-text => "Goto", -command => sub { $self->set_file($fname, $index) ; } ) ;
-  $btn->pack('side' => 'left', -fill => 'x', -expand => 1) ;
+  $btn->pack(-side => 'left', -fill => 'x', -expand => 1) ;
 
-  $lowerFrame = $frm->Frame()->pack('side' => 'top', '-fill' => 'x', 'expand' => 1) ;
+  $lowerFrame = $frm->Frame()->pack(-side => 'top', '-fill' => 'x', 'expand' => 1) ;
 
-  $lowerFrame->Label(-text => "Cond:")->pack('side' => 'left') ;
+  $lowerFrame->Label(-text => "Cond:")->pack(-side => 'left') ;
   
   $btn = $lowerFrame->Entry(-textvariable => \$brkPt->{'expr'}) ;
-  $btn->pack('side' => 'left', fill => 'x', -expand => 1) ;
+  $btn->pack(-side => 'left', -fill => 'x', -expand => 1) ;
   
-  $frm->pack(side => 'top', fill => 'x', -expand => 1) ;
+  $frm->pack(-side => 'top', -fill => 'x', -expand => 1) ;
 
   $row = pop @{$self->{'brkPtSlots'}} or $row = $self->{'brkPtCnt'} ;
 
@@ -2801,7 +2801,7 @@ sub GotoLine {
   
   $topLevel = $self->{main_window}->Toplevel(-title => "Goto Line?", -overanchor => 'cursor') ;
 
-  $self->{goto_text} = $topLevel->Entry()->pack(side => 'top', fill => 'both', -expand => 1) ;
+  $self->{goto_text} = $topLevel->Entry()->pack(-side => 'top', -fill => 'both', -expand => 1) ;
 
   $self->{goto_text}->bind('<Return>', $okaySub) ; # make a CR do the same thing as pressing an okay
 
@@ -2811,7 +2811,7 @@ sub GotoLine {
   # as pressing the Okay button
 
   $topLevel->Button( text => "Okay", -command => $okaySub, @Devel::ptkdb::button_font,
-                     )->pack(side => 'left', fill => 'both', -expand => 1) ;
+                     )->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 
   #
   # Subroutone called when the 'Dismiss'
@@ -2824,7 +2824,7 @@ sub GotoLine {
   } ;
 
   $topLevel->Button( text => "Dismiss", @Devel::ptkdb::button_font,
-                     -command => $dismissSub )->pack(side => 'left', fill => 'both', -expand => 1) ;
+                     -command => $dismissSub )->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 
   $topLevel->protocol('WM_DELETE_WINDOW', sub { destroy $topLevel ; } ) ;
 
@@ -2930,20 +2930,20 @@ sub FindText {
   #
   $top = $self->{main_window}->Toplevel(-title => "Find Text?") ;
 
-  $self->{find_text} = $top->Entry()->pack('side' => 'top', fill => 'both', -expand => 1) ;
+  $self->{find_text} = $top->Entry()->pack(-side => 'top', -fill => 'both', -expand => 1) ;
 
   
-  $frm = $top->Frame()->pack('side' => 'top', fill => 'both', -expand => 1) ;
+  $frm = $top->Frame()->pack(-side => 'top', -fill => 'both', -expand => 1) ;
 
   $self->{fwdOrBack} = 'forward' ;
-  $rad1 = $frm->Radiobutton('text' => "Forward", 'value' => 1, 'variable' => \$self->{fwdOrBack}) ;
-  $rad1->pack(side => 'left', fill => 'both', -expand => 1) ;
-  $rad2 = $frm->Radiobutton('text' => "Backward", 'value' => 0, 'variable' => \$self->{fwdOrBack}) ;
-  $rad2->pack(side => 'left', fill => 'both', -expand => 1) ;
+  $rad1 = $frm->Radiobutton(-text => "Forward", 'value' => 1, 'variable' => \$self->{fwdOrBack}) ;
+  $rad1->pack(-side => 'left', -fill => 'both', -expand => 1) ;
+  $rad2 = $frm->Radiobutton(-text => "Backward", 'value' => 0, 'variable' => \$self->{fwdOrBack}) ;
+  $rad2->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 
   $regExp = 0 ;
-  $chk = $frm->Checkbutton('text' => "RegExp", 'variable' => \$regExp) ;
-  $chk->pack(side => 'left', fill => 'both', -expand => 1) ;
+  $chk = $frm->Checkbutton(-text => "RegExp", 'variable' => \$regExp) ;
+  $chk->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 
   # Okay and cancel buttons
 
@@ -2952,12 +2952,12 @@ sub FindText {
 
   $okayBtn = $top->Button( text => "Okay", -command => sub { $self->FindSearch($self->{find_text}, $okayBtn, $regExp) ; }, 
                          @Devel::ptkdb::button_font,
-                           )->pack(side => 'left', fill => 'both', -expand => 1) ;
+                           )->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 
   $self->{find_text}->bind('<Return>', sub { $self->FindSearch($self->{find_text}, $okayBtn, $regExp) ; }) ;
 
   $top->Button( text => "Dismiss", @Devel::ptkdb::button_font,
-                -command => $dismissSub)->pack(side => 'left', fill => 'both', -expand => 1) ;
+                -command => $dismissSub)->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 
   $top->protocol('WM_DELETE_WINDOW', $dismissSub) ;
 
@@ -3131,11 +3131,11 @@ sub setupEvalWindow {
                                       width => 50,
                                       height => 10,
                                       -wrap => "none",
-                                      )->packAdjust('side' => 'top', 'fill' => 'both', -expand => 1) ;
+                                      )->packAdjust(-side => 'top', -fill => 'both', -expand => 1) ;
 
   $self->{eval_text}->insert('end', $self->{eval_saved_text}) if exists $self->{eval_saved_text} && defined $self->{eval_saved_text} ;
 
-  $top->Label(-text, "Results:")->pack('side' => 'top', 'fill' => 'both', -expand => 'n') ;
+  $top->Label(-text, "Results:")->pack(-side => 'top', -fill => 'both', -expand => 'n') ;
 
   $self->{eval_results} = $top->Scrolled('Text',
                                        @Devel::ptkdb::scrollbar_cfg,
@@ -3143,10 +3143,10 @@ sub setupEvalWindow {
                                          height => 10,
                                          -wrap => "none",
                                        @Devel::ptkdb::eval_text_font
-                                         )->pack('side' => 'top', 'fill' => 'both', -expand => 1) ;
+                                         )->pack(-side => 'top', -fill => 'both', -expand => 1) ;
 
   my $btn = $top->Button(-text => 'Eval...', -command => sub { $DB::window->{event} = 'reeval' ; }
-                         )->pack('side' => 'left', 'fill' => 'x', -expand => 1) ;
+                         )->pack(-side => 'left', -fill => 'x', -expand => 1) ;
 
   $dismissSub = sub { 
     $self->{eval_saved_text} = $self->{eval_text}->get('0.0', 'end') ;
@@ -3157,12 +3157,12 @@ sub setupEvalWindow {
   $top->protocol('WM_DELETE_WINDOW', $dismissSub ) ;
 
   $top->Button(-text => 'Clear Eval', -command => sub { $self->{eval_text}->delete('0.0', 'end') }
-               )->pack('side' => 'left', 'fill' => 'x', -expand => 1) ;
+               )->pack(-side => 'left', -fill => 'x', -expand => 1) ;
 
   $top->Button(-text => 'Clear Results', -command => sub { $self->{eval_results}->delete('0.0', 'end') }
-               )->pack('side' => 'left', 'fill' => 'x', -expand => 1) ;
+               )->pack(-side => 'left', -fill => 'x', -expand => 1) ;
 
-  $top->Button(-text => 'Dismiss', -command => $dismissSub)->pack('side' => 'left', 'fill' => 'x', -expand => 1) ;
+  $top->Button(-text => 'Dismiss', -command => $dismissSub)->pack(-side => 'left', -fill => 'x', -expand => 1) ;
 
 } # end of setupEvalWindow ;
 
@@ -3466,7 +3466,7 @@ package DB ;
 
 use vars '$VERSION', '$header' ;
 
-$VERSION = '1.1083' ;
+$VERSION = '1.1084' ;
 $header = "ptkdb.pm version $DB::VERSION";
 $DB::window->{current_file} = "" ;
 
@@ -4268,6 +4268,10 @@ sub DB {
 1 ; # return true value
 
 # $Log: ptkdb.pm,v $
+# Revision 1.6  2002/11/28 19:17:43  aepage
+# Changed many options to widgets and pack from bareword or 'bareword'
+# to -bareword to support Tk804.024(Devel).
+#
 # Revision 1.5  2002/11/25 23:47:03  aepage
 # A perl debugger package is required to define a subroutine name 'sub'.
 # This routine is a 'proxy' for handling subroutine calls and allows the

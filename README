@@ -1,3 +1,16 @@
+1.1084 Changed the 'bareword' and bareword options for widgets and pack to -bareword
+       to support Tk804.024
+
+
+1.1083   A perl debugger package is required to define a subroutine name 'sub'. 
+This routine is a 'proxy' for handling subroutine calls and allows the
+debugger pacakage to track subroutine depth so that it can implement
+'step over', 'step in' and 'return' functionality.  It must also handle
+the same context as the proxied routine; it must return a scalar where a
+scalar was being expected, an array where an array is being expected and
+a void where a void was being expected.  Ptkdb was not handling the case
+for void.  99.9% of the time this will have no ill effects although it
+is being handled incorrectly. 
 
 1.1075   Fix for perl 5.8.0.  Fixes to doc formatting.  $^W saves now done
          with local($^W).  Overdue correction for @_ context save.
