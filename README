@@ -1,0 +1,283 @@
+
+  ptkdb is a debugger for perl that uses the perlTk user interface.  It
+is compatable with unix versions of perlTk and Win32 versions.  
+
+REQUIREMENTS
+
+   ptkdb requires perl5.004 or greater and Tk400.202 or better.  
+
+INSTALLATION
+
+    You can use the MakeMaker interface:
+
+        perl Makefile.PL 
+        make
+        make install
+
+   Or you can install the file by hand:
+
+        mkdir  /usr/local/alpha/lib/perl5/site_perl/Devel
+        cp ptkdb.pm /usr/local/alpha/lib/perl5/site_perl/Devel/ptkdb.pm 
+
+   Or you can use the provided installation script which has
+   a perlTk user Interface:
+
+        perl install_ptkdb.pl
+
+
+    The ptkdb.pm module can be installed in the Devel directory
+in anypace within INC list.  You may also install it into a Devel
+directory that is local to a script that you are debugging.  
+
+   Example:
+
+    /usr/local/lib/perl5/sun4-solaris/5.00404/Devel
+
+	or
+
+    /usr/local/lib/perl5/site_perl/Devel
+
+
+   The install_ptkdb.pl script will provide you with a list
+of directories that ptkdb.pm can be installed into.  
+
+   USE:
+
+   Once installed you can invoke ptkdb as follows:
+
+   perl -d:ptkdb my_script.pl
+
+  
+NOTE: DO NOT invoke it like this: 
+
+perl -d:ptkdb.pm myscript.pl
+
+You will get an error like this: 
+
+syntax error at myscript.pl line 0, near "use Devel::ptkdb."
+Execution of myscript.pl aborted due to compilation errors.
+
+Expressions
+
+Expressions are entered in the entry line at the bottom of the
+window. They are displayed in a hierarchical list on the right side of
+the window. Arrays, hash refs and objects are decomposed and
+displayed.
+
+To enter an expression type the expression in the text entry field at
+the bottom of the window and press CR or < Alt >-E or select "Enter
+Expression" from the Data menu. If there is an active selection it
+will be entered as the expression unless anything is in the text entry
+field.
+
+Breakpoints
+
+Breakpoints are inserted at the insertion point in the text
+window. Each breakpoint appears as a separate check box
+control. Toggling the control "off" will disable the breakpoint; it
+can be reactivated by toggling it back "on".
+
+Breakpoints can be made to be conditional by entering an expression on
+the text entry line. The condition will be annotated to the line.  If
+there is an active selection then that will be used as the controlling
+expression.
+
+File Menu
+
+Open...
+
+Presents a selection dialog with a list of files that are part of the
+script being debugged. Selecting one and pressing okay, or double
+cliking the selection will open that file and put it into the code
+window. You can then add or delete breakpoints accordingly.
+
+Save Config...
+
+'Saves' the configuration of the debugger. If you use the default name
+provided with the selection of the "Save Breakpoints And
+Expressions..." menu item your breakpoints and expressions will be
+re-loaded autmatically the next time your script is invoked. NOTE: If
+your source file(s) that contains saved breakpoints has changed since
+the breakpoints were last saved the debugger will prompt you to see if
+you want to reload them. If the line that the breakpoint was on is
+long longer 'breakable' the breakpoint is removed.
+
+If you're debugging myscript.pl and you select "Save Config..." the
+dialog will prompt you with a default name of myscript.ptkdb.
+
+To enable this feature you need to have the Data::Dumper module
+installed.
+
+Restore Breakpoints and Expressions
+
+Selecting this will open up a 'prompt'. Enter the name of the file
+that you saved with the "Save Configuration". This will restore your
+breakpoints and expressions that were saved in the file. These
+breakpoints will be automatically restored when you restart the script
+if you used the default name given by the "Save Config?" prompt.
+
+Goto Line...
+
+"Goto Line" works in the following fashion. Selecting "Goto Line..."
+or one of its accelerators will bring up a dialog box. enter the line
+you wish to goto in the entry box and press either CR or the Okay
+button. The text window will scroll to that location. The entered text
+will highlight itself allowing you to delete it simply by entering a
+new number. The dialog goes away when you press the "Dismiss" button.
+
+Find Text...
+
+"Find Text..." works in the following fashion. Selecting "Find
+Text..." or one of its accelerators will bring up a dialog box. enter
+the text that you wish to search for and press either the CR or the
+"Okay" button. If the search was successful the code window will
+scroll to the found text highlight it. Forward, backward, and regular
+expression searches are supported. The entered text will highlight
+itself allowing you to delete it simply by entering a new number. The
+dialog goes away when you press the "Dismiss" button.
+
+Quit
+
+Causes the debugger and the script that it's running to exit. 
+
+Control Menu
+
+Run
+
+Runs the script until the script exits or until the next breakpoint. 
+
+Run To Here
+
+Runs to where ever the insertion cursor is 
+
+Set Breakpoint
+
+Sets a breakpoint on the line with the insertion cursor 
+
+Clear Breakpoint
+
+Clears a breakpont on the line with the insertion cursor 
+
+Clear All Breakpoints
+
+Removes all of the breakpoints 
+
+Step Over
+
+Steps over the next line or subroutine call. 
+
+Step In
+
+If the next line is a subroutine call, steps into the subroutine. If it is not a subroutine call, it steps over the line. 
+
+Return
+
+Runs until the current subroutine completes or reaches a breakpoint. 
+
+Data Menu
+
+Enter Expression
+
+Enters an expression in the "Enter Expr:" entry and puts into the expression window. 
+
+Delete Expression
+
+Deletes the selected expression in the expression window. 
+
+Delete All Expressions
+
+Deletes all of the existing expressions 
+
+Expression Evaluation Window
+
+Selecting this option will open up a window for you to evaluate
+expressions in the context of where the debugger is currently stopped.
+Enter a valid perl expression in the top pane and press the 'Eval...'
+button. The result of the expression is placed into the lower pane. If
+you have the Data::Dumper module installed the text of the result will
+be formatted for you.
+
+Use Data Dumper for Eval Window
+
+This allows you to disable the use of Data::Dumper for formatting the
+results of expressions. If Data::Dumper is not installed it will be
+disabled.
+
+Stack Menu
+
+This menu allows you to 'walk' back up the stack of subroutine
+calls. Selecting an item from this menu will set the code window to
+look at the subroutine listed and highlight the subroutine call made.
+
+Using Control C to stop a running script.
+
+You can force a script to enter the debugger by issuing SIGINT to the
+script process. SIGINT is typically given by using "Control-C" on the
+terminal window.
+
+NOTE: For some scripts this means that the terminal window, typically
+an Xterm on UNIX systems or a shell in Win95/NT, will have to be the
+selected window. Issuing a Control-C to the debugger window may not
+work.
+
+Installation by ptkdb.pm or install_ptkdb.pl
+
+Click on one of the two links above. The text of the script will
+appear in your browser. Select "Save As..." from the File menu and
+save the script.
+
+If you have write access to your perl5/lib directory you can copy
+ptkdb.pm into the Devel/ directory. If you don't have access you can
+create a Devel directory in a directory that is in one of your @INC
+directories, or the local directory of the script being debugged. The
+installation script can find and install these for you.
+
+Environmental Variables
+
+These variables can be used to control the appearence of the ptkdb interface. 
+
+PTKDB_STOP_TAG_COLOR
+
+Sets the color used for hilighting the line where the debugger has stopped. 
+
+PTKDB_BREAKPOINT_TEXT_COLOR
+
+Sets the color used for hilighting expressions attached to conidtional breakpoints. 
+
+PTKDB_CODE_FONT
+
+Font used in the code window. Standard X Font spec. Use the xfontsel
+utility to select one that's right for you.
+
+PTKDB_CODE_FONT_STOPPED
+
+Font used to highlight text where the debugger has stopped the program
+
+PTKDB_EXPRESSION_FONT
+
+Font used in the expression list window. Defaults to the same font
+specified for PTKDB_CODE_FONT.
+
+PTKDB_BUTTON_FONT
+
+Font used for the front panel buttons
+
+PTKDB_LINENUMBER_FORMAT
+
+Format(printf style %05d recommended) that will format the line
+numbers for the text window. The default value is "%05d ". To disable
+line numbers set PTKDB_LINENUMBER_FORMAT to a single space " ".
+
+PTKDB_EVAL_FONT
+
+Font used for the expression evaluation window.
+
+PTKDB_SIGINT_DISABLE
+
+Disables ptkdb's catching of a control-c when set to a non-zero value.
+
+PTKDB_EVAL_DUMP_INDENT
+
+Controls the 'Indent' value for Data::Dumper if it's available for
+use. Defaults to one. A value of 3 will add comments to arrays to show
+their indices.
