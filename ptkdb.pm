@@ -3136,7 +3136,7 @@ package DB ;
 
 use vars '$VERSION', '$header' ;
 
-$VERSION = '1.105' ;
+$VERSION = '1.1051' ;
 $header = "ptkdb.pm version $DB::VERSION";
 $DB::window->{current_file} = "" ;
 
