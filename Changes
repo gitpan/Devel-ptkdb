@@ -34,6 +34,3 @@ Revision history for Perl extension Devel::ptkdb.
 1.1052  Added a configuration option that allows users to change
         the packing arrangement of the code and notebook panes.  
         See POD section item:  PTKDB_CODE_SIDE
-
-1.1053  Added code that will update the 'subs' list when new code
-        is brought in through 'require' statements.

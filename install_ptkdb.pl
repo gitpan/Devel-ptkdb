@@ -1,3 +1,165 @@
+#! /usr/bin/perl -w
+#
+# If you've loaded this file via a browser
+# select "Save As..." from your File menu
+#
+#
+#
+#			   Perl Tk perl Debugger Installer
+#
+#		       Copyright 1998, Andrew E. Page
+#			    All rights reserved.
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of either:
+#
+#	a) the GNU General Public License as published by the Free
+#	Software Foundation; either version 1, or (at your option) any
+#	later version, or
+#
+#	b) the "Artistic License" which comes with this Kit.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
+#    the GNU General Public License or the Artistic License for more details.
+#
+#
+# This script will install ptkdb into a
+# writable directory in the @INC array,
+# or the home directory of the installing user
+#
+#
+require 5.004 ;
+use Tk ;
+use Config ;
+use strict 'vars' ;
+use File::Path ; # for mkpath
+
+my(@dirs, $main_window, $list, $install_path, $run_flag, $install_name, $okaySub, $f, $installed_in_INC) ;
+my($install_dir, $install_label, $installed_index, $i) ;
+
+$run_flag = 1 ;
+$install_name = 'ptkdb.pm' ;
+$install_path = "" ;
+
+#
+# Produce a list of the writable directories
+# in our @INC list.  The user will select one
+# to install ptkdb.pm
+#
+@dirs = grep -w, (@INC, $ENV{'HOME'}) ; # applies with -w (is writable operator) to each element in list
+
+#
+# now find out if any of the 'writable' dirs
+# have $install_name already installed.
+#
+$installed_index = -1 ;
+$i = 0 ;
+for( @dirs ) {
+    if( -f "$_/Devel/$install_name" ) {
+	$installed_index = $i ;
+	last ;
+    }
+    $i++ ;
+}
+$i = 0 ;
+if ($installed_index == -1 ) {
+  for (@dirs) {
+    if ( $_ eq $Config{'installprivlib'}) {
+	$installed_index = $i ;
+	last ;      
+    }
+    $i++
+  }
+}
+
+$main_window = MainWindow->new() ;
+
+$main_window->Label( 'text' => "Choose a directory to install ptkdb")->pack(side => 'top') ;
+
+#
+# Subroutine to execute when we press the okay
+# button or double click on a list item.
+#
+
+$okaySub = sub { 
+    $install_path = $list->get('active') ;
+    $run_flag = 0 ; # breaks event loop
+} ;
+
+
+$list = $main_window->Scrolled('Listbox',
+			       -selectmode => 'single'
+			       )->pack(side => 'top', fill => 'both', -expand => 'y') ;
+
+$list->bind('<Double-Button-1>' => $okaySub) ; # sets the double click action to same as the okay button
+
+$list->insert('end', @dirs) ;
+if ($installed_index > -1) {
+  $list->selectionClear(0, 'end') ;
+  $list->selectionSet($installed_index) if $installed_index > -1 ;
+  $list->activate($installed_index) ;
+}
+
+
+
+$main_window->Button( text => "Okay", -command => $okaySub,
+		      )->pack(side => 'left', fill => 'both', -expand => 'y') ;
+
+$main_window->Button( text => "Cancel",
+		      -command => sub { exit } )->pack(side => 'left', fill => 'both', -expand => 'y') ;
+
+#
+# We use this type of event loop in the because
+# this allows us to put all of the ptkdb.pm text
+# at the very bottom of the file and thus
+# we might be able to recycle this in the future
+# or automate the production of install scripts. 
+#
+while( $run_flag ) {
+      Tk::DoOneEvent(0);
+}
+
+exit if( $install_path eq "" ) ;
+$install_dir = $install_path ;
+
+$install_path .= "/Devel/" ;
+mkpath($install_path) ;
+$install_path .= $install_name ;
+local(*F) ;
+open F, ">$install_path" || die "ERROR Couldn't Open $install_path for writing\n" ;
+
+print "#\n# Installing \"$install_name\" in \"$install_path\"\n#\n" ;
+
+#
+# We do a check here to see if we made it into a @INC directory
+# so that we can provide a an example of a propper command line 
+# for invoking the debugger
+#
+$install_label = $install_name ;
+$install_label =~ s/\.pm$// ;
+$installed_in_INC = grep $_ eq $install_dir, @INC ;
+if( $installed_in_INC ) {
+    print <<"__INST__"
+# Debugger can be invoked:
+#
+# perl -d:$install_label myscript.pl
+#
+__INST__
+}
+else {
+    print <<"__INST__"
+# Debugger can be invoked:
+#
+# perl -I $install_dir -d:$install_label myscript.pl
+#
+__INST__
+}
+#
+# Actually write the perl script into the selected directory
+#
+print F <<'__EOF__'
 #
 # If you've loaded this file via a browser
 # select "Save As..." from your file menu
@@ -893,8 +1055,8 @@ sub do_user_init_files {
     }
 
     eval {
-			do "$ENV{'HOME'}/.ptkdbrc" ;
-    } if exists $ENV{'HOME'} && -e "$ENV{'HOME'}/.ptkdbrc" ;
+	do "$ENV{'HOME'}/.ptkdbrc" ;
+    } if -e "$ENV{'HOME'}/.ptkdbrc" ;
 
     if( $@ ) {
 	print "User init file $ENV{'HOME'}/.ptkdbrc failed: $@\n" ;
@@ -927,7 +1089,7 @@ sub new {
     $self->{window_pos_offset} = 10 ; # when we enter how far from the top of the text are we positioned down
     $self->{search_start} = "0.0" ;
     $self->{fwdOrBack} = 1 ;
-    $self->{BookMarksPath} = $ENV{'PTKDB_BOOKMARKS_PATH'} || "$ENV{'HOME'}/.ptkdb_bookmarks" || '.ptkdb_bookmarks'  ;
+    $self->{BookMarksPath} = $ENV{'PTKDB_BOOKMARKS_PATH'} || "$ENV{'HOME'}/.ptkdb_bookmarks" ;
 
     $self->{'expr_list'} = [] ; # list of expressions to eval in our window fields:  {'expr'} The expr itself {'depth'} expansion depth
 
@@ -2762,8 +2924,7 @@ sub main_loop {
 	$evt =~ /step/o && do { last SWITCH ; } ;
 	$evt =~ /null/o && do { next SWITCH ; } ;
 	$evt =~ /run/o && do { last SWITCH ; } ;
-	$evt =~ /quit/o && do { $self->{main_window}->destroy if $self->{main_window} ; 
-				$self->{main_window} = undef if defined $self->{main_window} ; exit ; } ;
+	$evt =~ /quit/o && do { exit ; } ;
 	$evt =~ /expr/o && do { return $evt ; } ; # adds an expression to our expression window
 	$evt =~ /qexpr/o && do { return $evt ; } ; # does a 'quick' expression
 	$evt =~ /update/o && do { return $evt ; } ; # forces an update on our expression window
@@ -3156,7 +3317,7 @@ sub code_motion_eval {
    # overloading the balloon window
    #
     
-   $self->{'expr_ballon_msg'} = "$self->{'balloon_expr'} = " . substr $str, 0, 1024 ;
+   $self->{'expr_ballon_msg'} = "$self->{'balloon_expr'} = " . substr $str, 0, 256 ;
 } # end of code motion eval
 
 #
@@ -3187,7 +3348,7 @@ package DB ;
 
 use vars '$VERSION', '$header' ;
 
-$VERSION = '1.1058' ;
+$VERSION = '1.1056' ;
 $header = "ptkdb.pm version $DB::VERSION";
 $DB::window->{current_file} = "" ;
 
@@ -3904,3 +4065,5 @@ sub sub {
 } # end of sub 
 
 1 ; # return true value
+
+__EOF__
