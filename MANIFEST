@@ -1,5 +1,7 @@
+README
+Changes
 MANIFEST
 Makefile.PL
-README
 ptkdb.pm
-install_ptkdb.pl
+test.pl
+install_ptkdb.pl.gz
