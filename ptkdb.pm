@@ -2421,6 +2421,16 @@ sub fixExprPath {
 
 } # end of fixExprPath
 
+##
+##  Inserts an expression($theRef) into an HList Widget($dl).  If the expression
+## is an array, blessed array, hash, or blessed hash(typical object), then this
+## routine is called recursively, adding the members to the next level of heirarchy,
+## prefixing array members with a [idx] and the hash members with the key name.
+## This continues until the entire expression is decomposed to it's atomic constituents.
+## Protection is given(with $reusedRefs) to ensure that 'circular' references within
+## arrays or hashes(i.e. where a member of a array or hash contains a reference to a
+## parent element within the heirarchy.  
+##
 #
 # Returns 1 if sucessfully added 0 if not
 #
@@ -2473,7 +2483,8 @@ sub insertExpr {
 		$self->DoAlert($@), return 0 if $@ ;
 		return 1 ;
 	}
-	if( $type eq 'ARRAY' ) {
+
+	if( $type eq 'ARRAY' or "$theRef" =~ /ARRAY/ ) {
 		my ($r, $idx) ;
 		$idx = 0 ;
 		eval {
@@ -3409,7 +3420,7 @@ package DB ;
 
 use vars '$VERSION', '$header' ;
 
-$VERSION = '1.1073' ;
+$VERSION = '1.1074' ;
 $header = "ptkdb.pm version $DB::VERSION";
 $DB::window->{current_file} = "" ;
 
