@@ -41,6 +41,10 @@
 #   failures with Tk800.011.
 # */
 # ptkdb*scrollbars: sw
+# 
+# /* controls where the code pane is oriented, down the left side, or across the top */
+# /* values can be set to left, right, top, bottom */
+# ptkdb*codeside: left
 # /*
 # * Background color for the balloon
 # * CAUTION:  For certain versions of Tk trailing
@@ -131,25 +135,32 @@ To debug a script using ptkdb invoke perl like this:
 
 =head1 Usage
 
-=head2 Main Window
+   perl -d:ptkdb myscript.pl
 
-=head2 Text Pane
+=head2 Code Pane
 
 =item Line Numbers
 
-Line numbers are presented on the left side of the window.  Lines that have lines
-through them are not breakable.  Lines that are plain text are breakable.  Clicking
-on these line numbers will insert a breakpoint on that line and change the line number
-color to $ENV{'PTKDB_BRKPT_COLOR'} (Defaults to Red).  Clicking on the number again will
-remove the breakpoint.  If you disable the breakpoint with the controls on the BrkPt
-notebook page the color will change to $ENV{'PTKDB_DISABLEDBRKPT_COLOR'}(Defaults to Green). 
+Line numbers are presented on the left side of the window.  Lines that
+have lines through them are not breakable.  Lines that are plain text
+are breakable.  Clicking on these line numbers will insert a
+breakpoint on that line and change the line number color to
+$ENV{'PTKDB_BRKPT_COLOR'} (Defaults to Red).  Clicking on the number
+again will remove the breakpoint.  If you disable the breakpoint with
+the controls on the BrkPt notebook page the color will change to
+$ENV{'PTKDB_DISABLEDBRKPT_COLOR'}(Defaults to Green).
 
 =item Cursor Motion
 
-If you place the cursor over a variable(i.e. $myVar, @myVar, or %myVar) and pause for a second
-the debugger will evaluate the current value of the variable and pop a balloon up with the
-evaluated result.  If Data::Dumper is available it will be used to format the result.  
-If there is an active selection, the text of that selection will be evaluated.  
+If you place the cursor over a variable (i.e. $myVar, @myVar, or
+%myVar) and pause for a second the debugger will evaluate the current
+value of the variable and pop a balloon up with the evaluated
+result. I<This feature is not available with Tk400.>
+
+If Data::Dumper(standard with perl5.00502)is available it will be used
+to format the result.  If there is an active selection, the text of
+that selection will be evaluated.
+
 
 =head2 Notebook Pane
 
@@ -158,7 +169,11 @@ If there is an active selection, the text of that selection will be evaluated.
 This is a list of expressions that are evaluated each time the debugger stops.  The results
 of the expresssion are presented heirarchically for expression that result in hashes or lists.
 Double clicking on such an expression will cause it to collapse; double clicking again
-will cause the expression to expand.  
+will cause the expression to expand.  Expressions are entered through B<Enter Expr> entry,
+or by Alt-E when text is selected in the code pane.
+
+The B<Quick Expr> entry, will take an expression, evaluate it, and replace the entries
+contents with the result.  The result is also transfered to the 'clipboard' for pasting.
 
 =item Subs
 
@@ -193,7 +208,9 @@ a file from this list will present this file in the text window.
 Requires Data::Dumper.  Prompts for a filename to save the configuration to.  Saves
 the breakpoints, expressions, eval text and window geometry.  If the name given as
 the default is used and the script is reinvoked, this configuration will be reloaded
-automatically.
+automatically.  
+
+B<NOTE:>  You may find this preferable to using 
 
 =item Restore Config...
 
@@ -327,6 +344,9 @@ fonts.
   
   */
   ptkdb*scrollbars: sw
+  /* controls where the code pane is oriented, down the left side, or across the top */
+  /* values can be set to left, right, top, bottom */
+  ptkdb*codeside: left
   
   /*
   * Background color for the balloon
@@ -394,6 +414,13 @@ Sets the background color of a disabled breakpoint
 =item PTKDB_CODE_FONT
 
 Sets the font of the Text in the code pane.
+
+=item PTKDB_CODE_SIDE
+
+Sets which side the code pane is packed onto.  Defaults to 'left'.
+Can be set to 'left', 'right', 'top', 'bottom'.  
+
+Overrides the Xresource ptkdb*codeside: I<side>. 
 
 =item PTKDB_EXPRESSION_FONT
 
@@ -558,9 +585,9 @@ Xserver can be another unix workstation, a Macintosh or Win32 platform
 with an appropriate XWindows package.  In your script insert the
 following BEGIN subroutine:
 
-sub BEGIN {
-  $ENV{'DISPLAY'} = "myHostname:0.0" ;
-}
+  sub BEGIN {
+    $ENV{'DISPLAY'} = "myHostname:0.0" ;
+  }
 
    Be sure that your web server has permission to open windows on your Xserver
 (see the xhost manpage).  
@@ -1746,6 +1773,12 @@ sub setup_frames {
     require Tk::Balloon ;
     require Tk::Adjuster ;
 
+    # get the side that we want to put the code pane on
+    
+    my($codeSide) = $ENV{'PTKDB_CODE_SIDE'} || $mw->optionGet("codeside", "") || 'left' ;
+
+    
+
     $mw->update ; # force geometry manager to map main_window
     $frm = $mw->Frame(-width => $mw->reqwidth()) ; # frame for our code pane and search controls
 
@@ -1765,7 +1798,7 @@ sub setup_frames {
     $frm->packPropagate(0) ;
     $txt->packPropagate(0) ;
 
-    $frm->packAdjust(side => 'left', fill => 'both', expand => 1) ;
+    $frm->packAdjust(side => $codeSide, fill => 'both', expand => 1) ;
     $txt->pack(side => 'left', fill => 'both', expand => 1) ;
 
     # $txt->form(-top => [ $self->{'menu_bar'} ], -left => '%0', -right => '%50') ;
@@ -1779,7 +1812,7 @@ sub setup_frames {
 
     $self->{'notebook'} = $mw->NoteBook() ;
     $self->{'notebook'}->packPropagate(0) ;
-    $self->{'notebook'}->pack(side => 'left', fill => 'both', -expand => 1) ;
+    $self->{'notebook'}->pack(side => $codeSide, fill => 'both', -expand => 1) ;
 
     #
     # an hlist for the data entries
@@ -3136,7 +3169,7 @@ package DB ;
 
 use vars '$VERSION', '$header' ;
 
-$VERSION = '1.1051' ;
+$VERSION = '1.1052' ;
 $header = "ptkdb.pm version $DB::VERSION";
 $DB::window->{current_file} = "" ;
 

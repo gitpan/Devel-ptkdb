@@ -1,4 +1,14 @@
 
+1.1052  Added a configuration option that allows users to change
+        the packing arrangement of the code and notebook panes.  
+	Use xresource ptkdb*codeside: left|right|top|bottom
+        Or environmental var PTKDB_CODE_SIDE=left|right|top|bottom
+
+        See POD section item:  PTKDB_CODE_SIDE
+
+1.105   Fixed incorrect evaluation of $@ in expressions.
+        Corrected some formatting issues with the POD section.
+
 1.104
 
 

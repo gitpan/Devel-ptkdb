@@ -1,5 +1,6 @@
 Revision history for Perl extension Devel::ptkdb.
 
+
 1.1  Mon Dec  7 14:36:17 1998
 	- original version; created by h2xs 1.18
 
@@ -26,3 +27,10 @@ Revision history for Perl extension Devel::ptkdb.
 
         Corrected a problem with where using ptkdb for 
         debugging other ptk apps would cause 'grab' problems.
+
+1.105   Fixed incorrect evaluation of $@ in expressions.
+        Corrected some formatting issues with the POD section.
+
+1.1052  Added a configuration option that allows users to change
+        the packing arrangement of the code and notebook panes.  
+        See POD section item:  PTKDB_CODE_SIDE
