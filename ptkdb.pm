@@ -700,6 +700,12 @@ Andrew E. Page, aepage@users.sourceforge.net
 
 Matthew Persico    For suggestions, and beta testing.
 
+=head1 BUG REPORTING
+
+Please report bugs through the following URL:
+
+http://sourceforge.net/tracker/?atid=437609&group_id=43854&func=browse
+
 =cut
 
 
@@ -756,6 +762,7 @@ if( $answer =~ /y|yes/i) {
 
 use Tk 800 ;
 use Data::Dumper ;
+use FileHandle ;
 
 require Tk::Dialog;
 require Tk::TextUndo ;
@@ -767,6 +774,37 @@ require Tk::Table ;
 use vars qw(@dbline) ;
 
 use Config ;
+
+sub DoBugReport {
+	my($str) = 'sourceforge.net/tracker/?atid=437609&group_id=43854&func=browse' ;
+	my(@browsers) = qw/netscape mozilla/ ;
+	my($fh, $pid, $sh) ;
+	
+	if( $isWin32 ) {
+	    $sh = '' ;
+	    @browsers = '"' . $ENV{'PROGRAMFILES'} . '\\Internet Explorer\\IEXPLORE.EXE' . '"' ;
+	    
+	}
+	else {
+	    $sh = 'sh' ;
+	    $str = "\'http://" . $str . "\'" ;
+	}
+
+	$fh = new FileHandle() ;
+
+	for( @browsers ) {
+	    $pid = open($fh, "$sh $_ $str 2&> /dev/null |") ;
+	    sleep(2) ; 
+	     waitpid $pid, 0 ;
+	     return if( $? == 0 ) ;
+	} 
+
+	print "##\n" ;
+	print "## Please submit a bug report through the following URL:\n" ;
+	print '##    http://sourceforge.net/tracker/?atid=437609&group_id=43854&func=browse', "\n" ;
+	print "##\n" ;	
+}
+
 #
 # Check to see if the package actually
 # exists. If it does import the routines
@@ -1203,10 +1241,10 @@ sub DoOpen {
   
   $listBox->insert('end', @fList) ;
 
-  $topLevel->Button( text => "Okay", -command => $chooseSub, @Devel::ptkdb::button_font,
+  $topLevel->Button( -text => "Okay", -command => $chooseSub, @Devel::ptkdb::button_font,
                      )->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 
-  $topLevel->Button( text => "Cancel", @Devel::ptkdb::button_font,
+  $topLevel->Button( -text => "Cancel", @Devel::ptkdb::button_font,
                      -command => sub { destroy $topLevel ; } )->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 } # end of DoOpen
 
@@ -1260,6 +1298,7 @@ sub setup_menu_bar {
   # file menu in menu bar
 
   $items = [ [ 'command' => 'About...', -command => sub { $self->DoAbout() ; } ],
+						 [ 'command' => 'Bug Report...', -command => \&DoBugReport ],
              "-",
 
              [ 'command' => 'Open', -accelerator => 'Alt+O',
@@ -1279,7 +1318,7 @@ sub setup_menu_bar {
              [ 'command' => 'Goto Line...',
                -underline => 0,
                -accelerator => 'Alt-g',
-               -command => \&DB::RestoreState,
+               -command => sub { $self->GotoLine() ; },
                @dataDumperEnableOpt ] ,
 
              [ 'command' => 'Find Text...',
@@ -2158,13 +2197,13 @@ sub simplePromptBox {
 
  $Devel::ptkdb::promptString = $defaultText ;
 
-  $entry = $top->Entry('-textvariable' => 'Devel::ptkdb::promptString')->pack(-side => 'top', -fill => 'both', -expand => 1) ;
+  $entry = $top->Entry('-textvariable' => \$Devel::ptkdb::promptString)->pack(-side => 'top', -fill => 'both', -expand => 1) ;
   
   
-  $okayBtn = $top->Button( text => "Okay", @Devel::ptkdb::button_font, -command => sub {  &$okaySub() ; $top->destroy ;}
+  $okayBtn = $top->Button( -text => "Okay", @Devel::ptkdb::button_font, -command => sub {  &$okaySub() ; $top->destroy ;}
                            )->pack(-side => 'left', -fill => 'both', -expand => 1) ;
   
-  $top->Button( text => "Cancel", -command => sub { &$cancelSub() if $cancelSub ; $top->destroy() }, @Devel::ptkdb::button_font,
+  $top->Button( -text => "Cancel", -command => sub { &$cancelSub() if $cancelSub ; $top->destroy() }, @Devel::ptkdb::button_font,
                 )->pack(-side => 'left', -fill => 'both', -expand => 1) ;
   
   $entry->icursor('end') ;
@@ -2829,7 +2868,7 @@ sub GotoLine {
   # Bind a double click on the mouse button to the same action
   # as pressing the Okay button
 
-  $topLevel->Button( text => "Okay", -command => $okaySub, @Devel::ptkdb::button_font,
+  $topLevel->Button( -text => "Okay", -command => $okaySub, @Devel::ptkdb::button_font,
                      )->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 
   #
@@ -2842,7 +2881,7 @@ sub GotoLine {
     delete $self->{goto_window} ; # remove the entry from our hash so we won't
   } ;
 
-  $topLevel->Button( text => "Dismiss", @Devel::ptkdb::button_font,
+  $topLevel->Button( -text => "Dismiss", @Devel::ptkdb::button_font,
                      -command => $dismissSub )->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 
   $topLevel->protocol('WM_DELETE_WINDOW', sub { destroy $topLevel ; } ) ;
@@ -2969,13 +3008,13 @@ sub FindText {
   # Bind a double click on the mouse button to the same action
   # as pressing the Okay button
 
-  $okayBtn = $top->Button( text => "Okay", -command => sub { $self->FindSearch($self->{find_text}, $okayBtn, $regExp) ; }, 
+  $okayBtn = $top->Button( -text => "Okay", -command => sub { $self->FindSearch($self->{find_text}, $okayBtn, $regExp) ; }, 
                          @Devel::ptkdb::button_font,
                            )->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 
   $self->{find_text}->bind('<Return>', sub { $self->FindSearch($self->{find_text}, $okayBtn, $regExp) ; }) ;
 
-  $top->Button( text => "Dismiss", @Devel::ptkdb::button_font,
+  $top->Button( -text => "Dismiss", @Devel::ptkdb::button_font,
                 -command => $dismissSub)->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 
   $top->protocol('WM_DELETE_WINDOW', $dismissSub) ;
@@ -3528,8 +3567,7 @@ package DB ;
 
 use vars '$VERSION', '$header' ;
 
-$VERSION = '1.1087' ;
-
+$VERSION = '1.1090'
 $header = "ptkdb.pm version $DB::VERSION";
 $DB::window->{current_file} = "" ;
 
@@ -4330,7 +4368,11 @@ sub DB {
 
 1 ; # return true value
 
-# $Log: ptkdb.pm,v $
+# ptkdb.pm,v
+# Revision 1.15  2004/03/31 02:08:40  aepage
+# fixes for various lacks of backwards compatiblity in Tk804
+# Added a 'bug report' item to the File Menu.
+#
 # Revision 1.14  2003/11/20 01:59:40  aepage
 # version fix
 #

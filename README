@@ -1,3 +1,7 @@
+
+1.109  Fixed various lacks of backwards incompatibility in Tk804
+	Added a 'bug report' item to the File menu.
+
 1.1084 Changed the 'bareword' and bareword options for widgets and pack to -bareword
        to support Tk804.024
 
