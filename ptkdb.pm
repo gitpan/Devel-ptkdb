@@ -1193,7 +1193,7 @@ sub DoOpen {
   $listBox = $topLevel->Scrolled('Listbox', 
                                @Devel::ptkdb::scrollbar_cfg,
                                @Devel::ptkdb::expression_text_font,
-                                 'width' => 30)->pack(-side => 'top', -fill => 'both', -expand => 1) ;
+                                -width => 30)->pack(-side => 'top', -fill => 'both', -expand => 1) ;
 
 
   # Bind a double click on the mouse button to the same action
@@ -2242,6 +2242,7 @@ sub insertBreakpoint {
   my ($btn, $cnt, $item) ;
 
   my($offset) ;
+
   local(*dbline) = $main::{'_<' . $fname} ;
 
   $offset = $dbline[1] =~ /use\s+.*Devel::_?ptkdb/ ? 1 : 0 ;
@@ -2281,7 +2282,7 @@ sub add_brkpt_to_brkpt_page {
   # take the last leaf of the pathname 
   
   $frm = $self->{'breakpts_table'}->Frame(-relief => 'raised') ; 
-  $upperFrame = $frm->Frame()->pack(-side => 'top', '-fill' => 'x', 'expand' => 1) ; 
+  $upperFrame = $frm->Frame()->pack(-side => 'top', '-fill' => 'x', -expand => 1) ; 
 
   
   $btn = $upperFrame->Checkbutton(-text => "$btnName:$index",
@@ -2296,7 +2297,7 @@ sub add_brkpt_to_brkpt_page {
   $btn = $upperFrame->Button(-text => "Goto", -command => sub { $self->set_file($fname, $index) ; } ) ;
   $btn->pack(-side => 'left', -fill => 'x', -expand => 1) ;
 
-  $lowerFrame = $frm->Frame()->pack(-side => 'top', '-fill' => 'x', 'expand' => 1) ;
+  $lowerFrame = $frm->Frame()->pack(-side => 'top', '-fill' => 'x', -expand => 1) ;
 
   $lowerFrame->Label(-text => "Cond:")->pack(-side => 'left') ;
   
@@ -2673,7 +2674,7 @@ use Carp ;
 
 sub set_file {
   my ($self, $fname, $line) = @_ ;
-  my ($lineStr, $offset, $text, $i, @text, $noCode) ;
+  my ($lineStr, $offset, $text, $i, @text, $noCode, $title) ;
   my (@breakableTagList, @nonBreakableTagList) ;
 
   return unless $fname ;  # we're getting an undef here on 'Restart...'
@@ -2696,8 +2697,9 @@ sub set_file {
     return ;
   } ;
 
-  $fname =~ s/^\-// ; # Tk does not like leadiing '-'s 
-  $self->{main_window}->configure('-title' => $fname) ;
+	$title = $fname ; # removing the - messes up stashes on -e invocations
+  $title =~ s/^\-// ; # Tk does not like leadiing '-'s 
+  $self->{main_window}->configure('-title' => $title) ;
 
   # Erase any existing text
 
@@ -2953,13 +2955,13 @@ sub FindText {
   $frm = $top->Frame()->pack(-side => 'top', -fill => 'both', -expand => 1) ;
 
   $self->{fwdOrBack} = 'forward' ;
-  $rad1 = $frm->Radiobutton(-text => "Forward", 'value' => 1, 'variable' => \$self->{fwdOrBack}) ;
+  $rad1 = $frm->Radiobutton(-text => "Forward", -value => 1, -variable => \$self->{fwdOrBack}) ;
   $rad1->pack(-side => 'left', -fill => 'both', -expand => 1) ;
-  $rad2 = $frm->Radiobutton(-text => "Backward", 'value' => 0, 'variable' => \$self->{fwdOrBack}) ;
+  $rad2 = $frm->Radiobutton(-text => "Backward", -value => 0, -variable => \$self->{fwdOrBack}) ;
   $rad2->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 
   $regExp = 0 ;
-  $chk = $frm->Checkbutton(-text => "RegExp", 'variable' => \$regExp) ;
+  $chk = $frm->Checkbutton(-text => "RegExp", -variable => \$regExp) ;
   $chk->pack(-side => 'left', -fill => 'both', -expand => 1) ;
 
   # Okay and cancel buttons
@@ -3113,6 +3115,9 @@ sub updateEvalWindow {
   for( @result ) {
     if( $self->{hexdump_evals} ) {
       # eventually put hex dumper code in here
+			
+			$self->{eval_results}->insert('end', hexDump($_)) ;
+
     }
     elsif( !$Devel::ptkdb::DataDumperAvailable || !$Devel::ptkdb::useDataDumperForEval ) {
       $str = "$_\n" ;
@@ -3132,6 +3137,46 @@ sub updateEvalWindow {
     $self->{eval_results}->insert('end', $str) ;
   }
 } # end of updateEvalWindow
+
+
+##
+## converts non printable chars to '.' for a string
+##
+sub printablestr {
+    return join "", map { (ord($_) >= 32 && ord($_) < 127) ? $_ : '.' } split //, $_[0] ;
+}
+
+##
+## hex dump utility function
+##
+sub hexDump {
+    my(@retList) ;
+    my($width) = 8 ;
+    my($offset) ;
+    my($len, $fmt, $n, @elems) ;
+
+    for( @_ ) {
+	my($str) ;
+	$len = length $_ ;
+	
+	while($len) {
+	    $n = $len >= $width ? $width : $len ;
+
+	    $fmt = "\n%04X  " . ("%02X " x $n ) . ( '   ' x ($width - $n) ) . " %s" ;
+	    @elems = map ord, split //, (substr $_, $offset, $n) ;
+	    $str .= sprintf($fmt, $offset, @elems, printablestr(substr $_, $offset, $n)) ;
+	    $offset += $width ;
+
+	    $len -= $n ;
+	} # while
+
+	push @retList, $str ;
+    } # for
+
+    return $retList[0] unless wantarray ;
+    return @retList ;
+} # end of hd
+
 
 sub setupEvalWindow {
   my($self) = @_ ;
@@ -3179,6 +3224,7 @@ sub setupEvalWindow {
                )->pack(-side => 'left', -fill => 'x', -expand => 1) ;
 
   $top->Button(-text => 'Dismiss', -command => $dismissSub)->pack(-side => 'left', -fill => 'x', -expand => 1) ;
+	$top->Checkbutton(-text => 'Hex', -variable => \$self->{hexdump_evals})->pack(-side => 'left') ;
 
 } # end of setupEvalWindow ;
 
@@ -3482,7 +3528,8 @@ package DB ;
 
 use vars '$VERSION', '$header' ;
 
-$VERSION = '1.1086' ;
+$VERSION = '1.1087' ;
+
 $header = "ptkdb.pm version $DB::VERSION";
 $DB::window->{current_file} = "" ;
 
@@ -4284,6 +4331,12 @@ sub DB {
 1 ; # return true value
 
 # $Log: ptkdb.pm,v $
+# Revision 1.14  2003/11/20 01:59:40  aepage
+# version fix
+#
+# Revision 1.12  2003/11/20 01:46:45  aepage
+# Hex Dumper and correction of some parameters for Tk804.025_beta6
+#
 # Revision 1.11  2003/06/26 13:42:49  aepage
 # fix for chars at the end of win32 platforms.
 #
