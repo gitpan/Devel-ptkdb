@@ -90,9 +90,6 @@
 #   */	
 #  ptkdb*searchtagcolor: green
 
-
-
-
 use strict ;
 use vars qw($VERSION @dbline %dbline);
 
@@ -119,6 +116,12 @@ Features include:
    Expression List
    Subroutine Tree
    
+
+=begin html
+
+<body bgcolor=white>
+
+=end html
 
 =head1 SYNOPSIS
 
@@ -305,77 +308,80 @@ can be added to .Xresources or .Xdefaults depending on your X configuration.
 To enable these resources you must either restart your X server or 
 use the xrdb -override resFile command.  xfontsel can be used to select
 fonts.
-/*
- * Perl Tk Debugger XResources.  
- * Note... These resources are subject to change.  
- *
- * Use 'xfontsel' to select different fonts.
- *
- * Append these resource to ~/.Xdefaults | ~/.Xresources
- * and use xrdb -override ~/.Xdefaults | ~/.Xresources
- * to activate them.  
- */
-/* Set Value to se to place scrollbars on the right side of windows 
-  CAUTION:  extra whitespace at the end of the line is causing
-  failures with Tk800.011.
 
-  sw -> puts scrollbars on left, se puts scrollars on the right
-
-*/
-ptkdb*scrollbars: sw
-
-/*
-* Background color for the balloon
-* CAUTION:  For certain versions of Tk trailing
-* characters after the color produces an error
-*/
-ptkdb.frame2.frame1.rotext.balloon.background: green
-ptkdb.frame2.frame1.rotext.balloon.font: fixed                       /* Hot Variable Balloon Font */
-
-
-ptkdb.frame*font: fixed                           /* Menu Bar */
-ptkdb.frame.menubutton.font: fixed                /* File menu */
-ptkdb.frame2.frame1.rotext.font: fixed            /* Code Pane */
-ptkdb.notebook.datapage.frame1.hlist.font: fixed  /* Expression Notebook Page */
-						 
-ptkdb.notebook.subspage*font: fixed               /* Subroutine Notebook Page */
-ptkdb.notebook.brkptspage*entry.font: fixed       /* Delete Breakpoint Buttons */
-ptkdb.notebook.brkptspage*button.font: fixed      /* Breakpoint Expression Entries */
-ptkdb.notebook.brkptspage*button1.font: fixed     /* Breakpoint Expression Entries */
-ptkdb.notebook.brkptspage*checkbutton.font: fixed /* Breakpoint Checkbuttons */
-ptkdb.notebook.brkptspage*label.font: fixed       /* Breakpoint Checkbuttons */
-						 
-ptkdb.toplevel.frame.textundo.font: fixed         /* Eval Expression Entry Window */
-ptkdb.toplevel.frame1.text.font: fixed            /* Eval Expression Results Window */
-ptkdb.toplevel.button.font:  fixed                /* "Eval..." Button */
-ptkdb.toplevel.button1.font: fixed                /* "Clear Eval" Button */
-ptkdb.toplevel.button2.font: fixed                /* "Clear Results" Button */
-ptkdb.toplevel.button3.font: fixed                /* "Clear Dismiss" Button */
-
-/*
- * Background color for where the debugger has stopped	
- */	
-ptkdb*stopcolor: blue
-
-/*
- * Background color for set breakpoints	
- */
-ptkdb*breaktagcolor*background: yellow
-ptkdb*disabledbreaktagcolor*background: white
-/*
- * Font for where the debugger has stopped
- */
-ptkdb*stopfont: -*-fixed-bold-*-*-*-*-*-*-*-*-*-*-*
-
-/*
- * Background color for the search tag
- */	
-ptkdb*searchtagcolor: green
+  /*
+   * Perl Tk Debugger XResources.  
+   * Note... These resources are subject to change.  
+   *
+   * Use 'xfontsel' to select different fonts.
+   *
+   * Append these resource to ~/.Xdefaults | ~/.Xresources
+   * and use xrdb -override ~/.Xdefaults | ~/.Xresources
+   * to activate them.  
+   */
+  /* Set Value to se to place scrollbars on the right side of windows 
+    CAUTION:  extra whitespace at the end of the line is causing
+    failures with Tk800.011.
+  
+    sw -> puts scrollbars on left, se puts scrollars on the right
+  
+  */
+  ptkdb*scrollbars: sw
+  
+  /*
+  * Background color for the balloon
+  * CAUTION:  For certain versions of Tk trailing
+  * characters after the color produces an error
+  */
+  ptkdb.frame2.frame1.rotext.balloon.background: green
+  ptkdb.frame2.frame1.rotext.balloon.font: fixed                       /* Hot Variable Balloon Font */
+  
+  
+  ptkdb.frame*font: fixed                           /* Menu Bar */
+  ptkdb.frame.menubutton.font: fixed                /* File menu */
+  ptkdb.frame2.frame1.rotext.font: fixed            /* Code Pane */
+  ptkdb.notebook.datapage.frame1.hlist.font: fixed  /* Expression Notebook Page */
+  						 
+  ptkdb.notebook.subspage*font: fixed               /* Subroutine Notebook Page */
+  ptkdb.notebook.brkptspage*entry.font: fixed       /* Delete Breakpoint Buttons */
+  ptkdb.notebook.brkptspage*button.font: fixed      /* Breakpoint Expression Entries */
+  ptkdb.notebook.brkptspage*button1.font: fixed     /* Breakpoint Expression Entries */
+  ptkdb.notebook.brkptspage*checkbutton.font: fixed /* Breakpoint Checkbuttons */
+  ptkdb.notebook.brkptspage*label.font: fixed       /* Breakpoint Checkbuttons */
+  						 
+  ptkdb.toplevel.frame.textundo.font: fixed         /* Eval Expression Entry Window */
+  ptkdb.toplevel.frame1.text.font: fixed            /* Eval Expression Results Window */
+  ptkdb.toplevel.button.font:  fixed                /* "Eval..." Button */
+  ptkdb.toplevel.button1.font: fixed                /* "Clear Eval" Button */
+  ptkdb.toplevel.button2.font: fixed                /* "Clear Results" Button */
+  ptkdb.toplevel.button3.font: fixed                /* "Clear Dismiss" Button */
+  
+  /*
+   * Background color for where the debugger has stopped	
+   */	
+  ptkdb*stopcolor: blue
+  
+  /*
+   * Background color for set breakpoints	
+   */
+  ptkdb*breaktagcolor*background: yellow
+  ptkdb*disabledbreaktagcolor*background: white
+  /*
+   * Font for where the debugger has stopped
+   */
+  ptkdb*stopfont: -*-fixed-bold-*-*-*-*-*-*-*-*-*-*-*
+  
+  /*
+   * Background color for the search tag
+   */	
+  ptkdb*searchtagcolor: green
 
 
 
 
 =head1 Environmental Variables
+
+=over 4
 
 =item PTKDB_BRKPT_COLOR
 
@@ -424,6 +430,8 @@ Sets the path of the bookmarks file.  Default is $ENV{'HOME'}/.ptkdb_bookmarks
 
 Sets the color that highlights the line where the debugger is stopped 
 
+=back
+
 =head1 FILES
 
 =head2 .ptkdbrc
@@ -435,6 +443,8 @@ variable $DB::no_stop_at_start that may be set to non-zero to prevent the debugg
 stopping at the first line of the script.  This is useful for debugging CGI scripts.
 
 There is a system ptkdbrc file in $PREFIX/lib/perl5/$VERS/Devel/ptkdbrc
+
+=over 4
 
 =item brkpt($fname, @lines)
 
@@ -488,14 +498,16 @@ textTagConfigure('nonbreakableLine', -overstrike => 0, -foreground => "yellow") 
 quote character \' to prevent the expression from being "evaluated" in
 the string context.
 
-Example:
 
-#
-# Adds the $_ and @_ expressions to the active list
-#
+ Example:
 
-    add_exprs('$_', '@_') ;
+ #
+ # Adds the $_ and @_ expressions to the active list
+ #
 
+     add_exprs('$_', '@_') ;
+
+=back
 
 =head1 NOTES
 
@@ -528,9 +540,9 @@ Example:
 
 =head2 Debugging CGI Scripts
 
-   One advantage of ptkdb over the builtin debugger(-d) is that can be used
-to debug CGI perl scripts as they run on a web server.  Be sure that that your
-web server's perl instalation includes Tk.  
+   One advantage of ptkdb over the builtin debugger(-d) is that it can
+be used to debug CGI perl scripts as they run on a web server.  Be
+sure that that your web server's perl instalation includes Tk.
 
 Change your
 
@@ -541,7 +553,7 @@ to
  #! /usr/local/bin/perl -d:ptkdb
 
 TIP: You can debug scripts remotely if you're using a unix based
-server and where you're authoring the script has an Xserver.  The
+server and where you are authoring the script has an Xserver.  The
 Xserver can be another unix workstation, a Macintosh or Win32 platform
 with an appropriate XWindows package.  In your script insert the
 following BEGIN subroutine:
@@ -572,6 +584,11 @@ installing a .ptkdbrc file in the same directory as the target script.
 If the size of the right hand pane is too small the breakpoint controls
 are not visible.  The breakpoints are still there, the window may have
 to be enlarged in order for them to be visible.  
+
+=item Balloons and Tk400
+
+The Balloons in Tk400 will not work with ptkdb.  All other functions
+are supported, but the Balloons require Tk800 or higher.
 
 =head1 AUTHOR
 
@@ -1770,17 +1787,31 @@ sub setup_frames {
     $self->{'data_page'} = $self->{'notebook'}->add("datapage", -label => "Exprs") ;
 
     #
+    # frame, entry and label for quick expressions
+    #
+    my $frame = $self->{'data_page'}->Frame()->pack(side => 'top', fill => 'x') ;
+    
+    my $label = $frame->Label('text' => "Quick Expr:")->pack(side => 'left') ;
+    
+    $self->{'quick_entry'} = $frame->Entry()->pack(side => 'left', fill => 'x', -expand => 1) ;
+
+    $self->{'quick_entry'}->bind('<Return>', sub { $self->QuickExpr() ; } ) ;
+    
+
+    #
     # Entry widget for expressions and breakpoints
     #
-    my $frame = $self->{'data_page'}->Frame() ;
+    $frame = $self->{'data_page'}->Frame()->pack(side => 'top', fill => 'x') ;
 
-    $frame->pack(side => 'top', fill => 'x') ;
+    $label = $frame->Label('text' => "Enter Expr:")->pack(side => 'left') ;
 
-    my $label = $frame->Label('text' => "Enter Expr:")->pack(side => 'left') ;
+    $self->{'entry'} = $frame->Entry()->pack(side => 'left', fill => 'x', -expand => 1) ;
 
-    $self->{entry} = $frame->Entry()->pack(side => 'left', fill => 'x', -expand => 1) ;
+    $self->{'entry'}->bind('<Return>', sub { $self->EnterExpr() }) ;
 
-    $self->{entry}->bind('<Return>', sub { $self->EnterExpr() }) ;
+    #
+    # Hlist for data expressions
+    #
 
 
     $self->{data_list} = $self->{'data_page'}->Scrolled('HList',
@@ -1816,6 +1847,10 @@ sub configure_text {
     $self->{'balloon_dumper'} = new Data::Dumper([$place_holder]) ;
     $self->{'balloon_dumper'}->Terse(1) ;
     $self->{'balloon_dumper'}->Indent($Devel::ptkdb::eval_dump_indent) ;
+
+    $self->{'quick_dumper'} = new Data::Dumper([$place_holder]) ;
+    $self->{'quick_dumper'}->Terse(1) ;
+    $self->{'quick_dumper'}->Indent(0) ;
   }
   
   $self->{'expr_ballon_msg'} = ' ' ;
@@ -2186,6 +2221,20 @@ sub EnterExpr {
 	$self->{'event'} = 'expr' ;
     }
 } # end of EnterExpr
+
+#
+#
+#
+sub QuickExpr {
+    my ($self) = @_ ;
+
+    my $str = $self->{'quick_entry'}->get() ;
+
+    if( $str && $str ne "" && $str !~ /^\s+$/ ) { # if there is an expression and it's more than white space
+	$self->{'qexpr'} = $str ;
+	$self->{'event'} = 'qexpr' ;
+    }
+} # end of QuickExpr
 
 sub deleteExpr {
     my ($self) = @_ ;
@@ -2670,6 +2719,7 @@ sub main_loop {
 	$evt =~ /run/o && do { last SWITCH ; } ;
 	$evt =~ /quit/o && do { exit ; } ;
 	$evt =~ /expr/o && do { return $evt ; } ; # adds an expression to our expression window
+	$evt =~ /qexpr/o && do { return $evt ; } ; # does a 'quick' expression
 	$evt =~ /update/o && do { return $evt ; } ; # forces an update on our expression window
 	$evt =~ /reeval/o && do { return $evt ; } ; # updated the open expression eval window
 	$evt =~ /balloon_eval/ && do { return $evt } ;
@@ -2849,7 +2899,6 @@ sub setupEvalWindow {
 
 } # end of setupEvalWindow ;
 
-
 sub filterBreakPts {
     my ($breakPtsListRef, $fname) = @_ ;
     my $dbline = $main::{'_<' . $fname}; # breakable lines
@@ -2896,12 +2945,12 @@ This program is free software; you can redistribute it and/or modify
 OS $^O
 Tk Version $Tk::VERSION
 Perl Version $]
+Data::Dumper Version $Data::Dumper::VERSION
 $threadString
 __STR__
 
     $self->DoAlert($str, "About ptkdb") ;
 } # end of DoAbout
-
 
 #
 # return 1 if succesfully set,
@@ -3003,8 +3052,8 @@ sub retrieve_text_expr {
 
     local(*dbline) = $main::{'_<' . $self->{current_file}} ;   
 
-    return undef if( $dbline[$idx] == 0 ) ; # no executable text, no real variable(?)
-
+    return undef if( !defined $dbline[$idx] || $dbline[$idx] == 0 ) ; # no executable text, no real variable(?)
+    
     $data = $dbline[$idx] ;
     
     # if we're sitting over white space, leave
@@ -3087,7 +3136,7 @@ package DB ;
 
 use vars '$VERSION', '$header' ;
 
-$VERSION = '1.104' ;
+$VERSION = '1.105' ;
 $header = "ptkdb.pm version $DB::VERSION";
 $DB::window->{current_file} = "" ;
 
@@ -3557,6 +3606,8 @@ sub dbeval {
 
     @result = eval <<__EVAL__ ;
 
+    \$\@ = \$DB::save_err ;
+
     package $package ;
 
     $expr ;
@@ -3589,6 +3640,7 @@ sub dbexit {
 # Refs:  Progamming Perl 2nd Edition, Larry Wall, O'Reilly & Associates, Chapter 8
 #
 sub DB {
+  $DB::save_err = $@ ; # save value of $@
   my ($package, $filename, $line) = caller ;
   my $stop ;
 
@@ -3596,8 +3648,17 @@ sub DB {
 
   &DB::Initialize($filename) unless $DB::ptkdb::isInitialized ; # do some setup stuff our first time through
 
-  $DB::single = 0, return unless isBreakPoint($filename, $line, $package) ;
-  return unless $DB::window ; # not setup yet
+  if (!isBreakPoint($filename, $line, $package) ) {
+    $DB::single = 0 ;
+    $@ = $DB::save_err ;
+    return ;
+  }
+
+  if ( !$DB::window ) { # not setup yet
+     $@ = $DB::save_err ;
+     return ;
+  }
+
 
  $DB::window->EnterActions() ; 
 
@@ -3616,7 +3677,8 @@ sub DB {
   if( $DB::no_stop_at_start ) {
     $DB::no_stop_at_start = 0 ;
     $DB::on = 0 ;
-      return ;
+    $@ = $DB::save_err ;
+    return ;
   }
 
   if( !$DB::sigint_disable ) {
@@ -3655,6 +3717,28 @@ sub DB {
      if ($evt eq 'balloon_eval' ) {
        $DB::window->code_motion_eval(&DB::dbeval($package, $DB::window->{'balloon_expr'})) ;
 	 next ;
+     }
+
+     if ( $evt eq 'qexpr' ) {
+       my $str ;
+       @result = &DB::dbeval($package, $DB::window->{'qexpr'}) ;
+       $DB::window->{'quick_entry'}->delete(0, 'end') ; # clear old text
+       if (exists $DB::window->{'quick_dumper'}) {
+	 $DB::window->{'quick_dumper'}->Reset() ;
+	 $DB::window->{'quick_dumper'}->Values( [ $#result == 0 ? @result : \@result ] ) ;
+	 if( $DB::window->{'quick_dumper'}->can('Dumpxs') ) {
+	   $str = $DB::window->{'quick_dumper'}->Dumpxs() ;
+	 }
+	 else {
+	   $str = $DB::window->{'quick_dumper'}->Dump() ;
+	 } 
+       }
+       else {
+	 $str = "@result" ;
+       }
+       $DB::window->{'quick_entry'}->insert(0, $str) ; #enter the text
+       $DB::window->{'quick_entry'}->selectionRange(0, 'end') ; # select it
+       $evt = 'update' ; # force an update on the expressions
      }
 
      if( $evt eq 'expr' ) {
@@ -3709,7 +3793,8 @@ sub DB {
 
  $DB::window->LeaveActions() ;
 
- $DB::on = 0 ;
+  $@ = $DB::save_err ;
+  $DB::on = 0 ;
 } # end of DB
 
 #
