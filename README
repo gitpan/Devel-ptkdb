@@ -1,4 +1,11 @@
 
+
+
+1.1073  Added key shortcuts.  Added 'white' foreground to the 'stoppt' tag to make text more visible.  
+	Experimental feature that checks for and tries to install Tk if it's missing.  
+
+1.1072  Added feature that delays loading of the subs page until the notebook page is brought forward
+
 1.107   Release
 
 1.1068  Fixed a minor warning put out by pod2man during installation that's been grating

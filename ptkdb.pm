@@ -648,9 +648,59 @@ Matthew Persico		 For suggestions, and beta testing.
 
 
 require 5.004 ;
-use Tk 400.000 ;
+
+
+##
+## Perform a check to see if we have the Tk library, if not, attempt
+## to load it for the user
+##
+
+sub BEGIN {
+
+eval {
+require Tk  ;
+} ;
+if( $@ ) {
+print << "__PTKDBTK_INSTALL__" ;
+***
+*** The PerlTk library could not be found.  Ptkdb requires the PerlTk library.
+***
+Preferably Tk800.015 or better: 
+
+In order to install this the following conditions must be met:
+
+1.  You have to have access to a C compiler.
+2.  You must have sufficient permissions to install the libraries on your system.
+
+To install PerlTk:
+
+a  Download the Tk library source from http://www.perl.com/CPAN/modules/by-category/08_User_Interfaces/Tk
+b  Uncompress the archive and run "perl Makefile.PL"
+c  run "make install"
+
+   If this process completes successfully ptkdb should be operational now.  
+
+We can attempt to run the CPAN module for you.  This will, after some questions, download
+and install the Tk library automatically.  
+
+Would you like to run the CPAN module? (y/n) 
+__PTKDBTK_INSTALL__
+
+my $answer = <STDIN> ;
+chomp $answer ;
+if( $answer =~ /y|yes/i) {
+	require CPAN ;
+	CPAN::install Tk ;
+} # if
+
+} # if $@
+
+
+} # end of sub BEGIN 
+
+use Tk 800 ;
 use Data::Dumper ;
-require Tk ;
+
 require Tk::Dialog;
 require Tk::TextUndo ;
 require Tk::ROText;
@@ -1227,7 +1277,7 @@ sub setup_menu_bar {
 	$items = [ [ 'command' => 'Run', -accelerator => 'Alt+r', underline => 0, -command => $runSub ],
 						 [ 'command' => 'Run To Here', -accelerator => 'Alt+t', -underline => 5, -command => $runToSub ],
 						 '-',
-						 [ 'command' =>  'Set Breakpoint', -underline => 4, -command => sub { $self->SetBreakPoint ; } ],
+						 [ 'command' =>  'Set Breakpoint', -underline => 4, -command => sub { $self->SetBreakPoint ; }, -accelerator => 'Ctrl-b' ],
 						 [ 'command' => 'Clear Breakpoint', -command => sub { $self->UnsetBreakPoint } ],
 						 [ 'command' => 'Clear All Breakpoints', -underline => 6, -command => sub {			
 						 $DB::window->removeAllBreakpoints($DB::window->{current_file}) ;
@@ -1255,6 +1305,7 @@ sub setup_menu_bar {
 
 	$mw->bind('<Alt-r>' => $runSub) ;
 	$mw->bind('<Alt-t>', $runToSub) ;
+	$mw->bind('<Control-b>', sub { $self->SetBreakPoint ; }) ;
 
 	for( @Devel::ptkdb::step_over_keys ) {
 		$mw->bind($_ => $stepOverSub );
@@ -1295,18 +1346,39 @@ sub setup_menu_bar {
 	#
 	$self->{stack_menu} = $mb->Menubutton(text => 'Stack',
 																				underline => 2,
-																				)->pack(side =>, 'left',
+																				)->pack(side => 'left',
 																								'padx' => 2) ;
 
 	#
 	# Bookmarks menu
 	#
-	$self->{bookmarks_menu} = $mb->Menubutton(text => 'Bookmarks',
+	$self->{bookmarks_menu} = $mb->Menubutton('text' => 'Bookmarks',
 																						underline => 0,
 																						@dataDumperEnableOpt
-																						)->pack(side =>, 'left',
+																						)->pack(-side => 'left',
 																										'padx' => 2) ;
 	$self->setup_bookmarks_menu() ;
+
+	#
+	# Windows Menu
+	#
+	my($bsub) = sub { $self->{'text'}->focus() } ;
+	my($csub) = sub { $self->{'quick_entry'}->focus() } ;
+	my($dsub) = sub { $self->{'entry'}->focus() } ;
+
+	$items = [ [ 'command' => 'Code Pane', -accelerator => 'Alt+0', -command => $bsub ],
+						 [ 'command' => 'Quick Entry', -accelerator => 'F9', -command => $csub ],
+						 [ 'command' => 'Expr Entry', -accelerator => 'F11', -command => $dsub ]
+						 ] ;
+
+	$mb->Menubutton('text' => 'Windows', -menuitems => $items
+									)->pack(-side => 'left',
+													-padx => 2) ;
+
+	$mw->bind('<Alt-0>', $bsub) ;
+	$mw->bind('<F9>', $csub) ;
+	$mw->bind('<F11>', $dsub) ;
+
 	#
 	# Bar for some popular controls
 	#
@@ -1746,6 +1818,8 @@ sub fill_subs_page {
 sub setup_subs_page {
 	my($self) = @_ ;
 
+	$self->{'subs_page_activated'} = 1 ;
+
 	$self->{'sub_list'} = $self->{'subs_page'}->Scrolled('HList',	 -command => sub { $self->sub_list_cmd(@_) ; } ) ;
 
 	$self->fill_subs_page() ;
@@ -1895,12 +1969,14 @@ sub setup_frames {
 													 ) ;
 
 
-
-	$self->{'subs_page'} = $self->{'notebook'}->add("subspage", -label => "Subs") ;
+	$self->{'subs_page_activated'} = 0 ;
+	$self->{'subs_page'} = $self->{'notebook'}->add("subspage", -label => "Subs", -createcmd => sub { $self->setup_subs_page }) ;
 
 	$self->setup_breakpts_page() ;		
 
 } # end of setup_frames
+
+
 
 sub configure_text {
 	my($self) = @_ ;
@@ -1932,7 +2008,7 @@ sub configure_text {
 	
 	# tags for the text
 	
-	my @stopTagConfig = ( -background	 => $mw->optionGet("stopcolor", "background") || $ENV{'PTKDB_STOP_TAG_COLOR'} || 'blue' ) ;
+	my @stopTagConfig = ( -foreground => 'white', -background	 => $mw->optionGet("stopcolor", "background") || $ENV{'PTKDB_STOP_TAG_COLOR'} || 'blue' ) ;
 	
 	my $stopFnt = $mw->optionGet("stopfont", "background") || $ENV{'PTKDB_STOP_TAG_FONT'} ;
 	push @stopTagConfig, ( -font => $stopFnt ) if $stopFnt ; # user may not have specified a font, if not, stay with the default
@@ -1984,8 +2060,9 @@ sub DoAlert {
 
 	$dlg->Label( 'text' => $msg )->pack( side => 'top' ) ;
 
-	$dlg->Button( 'text' => "Okay", -command => $okaySub )->pack( side => 'top' )	 ;
+	$dlg->Button( 'text' => "Okay", -command => $okaySub )->pack( side => 'top' )->focus	 ;
 	$dlg->bind('<Return>', $okaySub) ;
+
 } # end of DoAlert
 
 sub simplePromptBox {
@@ -3315,7 +3392,14 @@ sub set_stop_on_warning {
 		$SIG{'__WARN__'} = \&stop_on_warning_cb ;
 		 }
 	else {
+		##
+		## Restore any previous warning signal
+		##
+		my($saveW) ;
+		$saveW = $^W ; # save the warning -w setting
+		$^W = 0 ; # warning disabled since undef is a valid value to set the signal to
 		$SIG{'__WARN__'} = $DB::ptkdb::warn_sig_save ;
+		$^W = 0 ; # resore the warning
 	}
 } # end of set_stop_on_warning
 
@@ -3325,7 +3409,7 @@ package DB ;
 
 use vars '$VERSION', '$header' ;
 
-$VERSION = '1.1071' ;
+$VERSION = '1.1073' ;
 $header = "ptkdb.pm version $DB::VERSION";
 $DB::window->{current_file} = "" ;
 
@@ -3599,8 +3683,6 @@ sub Initialize {
 	else {
 		&DB::restoreState($fName) if $Devel::ptkdb::DataDumperAvailable ;
 	}
-
- $DB::window->setup_subs_page() ;
 
 } # end of Initialize 
 
@@ -3934,9 +4016,9 @@ sub DB {
 	 # Update subs Page if necessary
 	 #
 	 $cnt = scalar keys %DB::sub ;
-	 if ( $cnt != $DB::window->{'subs_list_cnt'} ) {
-	 $DB::window->fill_subs_page() ;
-	 $DB::window->{'subs_list_cnt'} = $cnt ;
+	 if ( $cnt != $DB::window->{'subs_list_cnt'} && $DB::window->{'subs_page_activated'} ) {
+	   $DB::window->fill_subs_page() ;
+	   $DB::window->{'subs_list_cnt'} = $cnt ;
 	 }
 	 #
 	 # Update the subroutine stack menu
