@@ -3187,7 +3187,7 @@ package DB ;
 
 use vars '$VERSION', '$header' ;
 
-$VERSION = '1.1058' ;
+$VERSION = '1.1059' ;
 $header = "ptkdb.pm version $DB::VERSION";
 $DB::window->{current_file} = "" ;
 
@@ -3640,11 +3640,11 @@ sub breakPointEvalExpr {
 # to properly interpret the vars
 #
 sub dbeval {
-    my ($package, $expr) = @_ ;
-    my (@result, $str, $saveW) ;
+    my ($ptkdb__package, $ptkdb__expr) = @_ ;
+    my (@ptkdb__result, $ptkdb__str, $ptkdb__saveW) ;
 
     no strict ;
-    $saveW = $^W ; # save the state of the "warning"(-w) flag
+    $ptkdb__saveW = $^W ; # save the state of the "warning"(-w) flag
     $^W = 0 ;
 
     #
@@ -3653,25 +3653,25 @@ sub dbeval {
     # An expression of %hash results in a
     # list of key/value pairs.  
     #
-    $expr =~ s/\s*%/\\%/o ;
+    $ptkdb__expr =~ s/\s*%/\\%/o ;
 
-    @result = eval <<__EVAL__ ;
+    @ptkdb__result = eval <<__EVAL__ ;
 
     \$\@ = \$DB::save_err ;
 
-    package $package ;
+    package $ptkdb__package ;
 
-    $expr ;
+    $ptkdb__expr ;
 
 __EVAL__
 
-    @result = ("ERROR ($@)") if $@ ;
+    @ptkdb__result = ("ERROR ($@)") if $@ ;
 
-    $^W = $saveW ; # restore the state of the "warning"(-w) flag
+    $^W = $ptkdb__saveW ; # restore the state of the "warning"(-w) flag
 
     use strict ;
 
-    return @result ;
+    return @ptkdb__result ;
 } # end of dbeval
 
 #

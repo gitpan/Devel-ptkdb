@@ -1,4 +1,7 @@
 
+1.1059  Corrected a bug where vars in the dbval subroutine could eclipse
+        vars that were in targe code
+
 1.1052  Added a configuration option that allows users to change
         the packing arrangement of the code and notebook panes.  
 	Use xresource ptkdb*codeside: left|right|top|bottom

@@ -1055,8 +1055,8 @@ sub do_user_init_files {
     }
 
     eval {
-	do "$ENV{'HOME'}/.ptkdbrc" ;
-    } if -e "$ENV{'HOME'}/.ptkdbrc" ;
+			do "$ENV{'HOME'}/.ptkdbrc" ;
+    } if exists $ENV{'HOME'} && -e "$ENV{'HOME'}/.ptkdbrc" ;
 
     if( $@ ) {
 	print "User init file $ENV{'HOME'}/.ptkdbrc failed: $@\n" ;
@@ -1089,7 +1089,7 @@ sub new {
     $self->{window_pos_offset} = 10 ; # when we enter how far from the top of the text are we positioned down
     $self->{search_start} = "0.0" ;
     $self->{fwdOrBack} = 1 ;
-    $self->{BookMarksPath} = $ENV{'PTKDB_BOOKMARKS_PATH'} || "$ENV{'HOME'}/.ptkdb_bookmarks" ;
+    $self->{BookMarksPath} = $ENV{'PTKDB_BOOKMARKS_PATH'} || "$ENV{'HOME'}/.ptkdb_bookmarks" || '.ptkdb_bookmarks'  ;
 
     $self->{'expr_list'} = [] ; # list of expressions to eval in our window fields:  {'expr'} The expr itself {'depth'} expansion depth
 
@@ -2924,7 +2924,8 @@ sub main_loop {
 	$evt =~ /step/o && do { last SWITCH ; } ;
 	$evt =~ /null/o && do { next SWITCH ; } ;
 	$evt =~ /run/o && do { last SWITCH ; } ;
-	$evt =~ /quit/o && do { exit ; } ;
+	$evt =~ /quit/o && do { $self->{main_window}->destroy if $self->{main_window} ; 
+				$self->{main_window} = undef if defined $self->{main_window} ; exit ; } ;
 	$evt =~ /expr/o && do { return $evt ; } ; # adds an expression to our expression window
 	$evt =~ /qexpr/o && do { return $evt ; } ; # does a 'quick' expression
 	$evt =~ /update/o && do { return $evt ; } ; # forces an update on our expression window
@@ -3317,7 +3318,7 @@ sub code_motion_eval {
    # overloading the balloon window
    #
     
-   $self->{'expr_ballon_msg'} = "$self->{'balloon_expr'} = " . substr $str, 0, 256 ;
+   $self->{'expr_ballon_msg'} = "$self->{'balloon_expr'} = " . substr $str, 0, 1024 ;
 } # end of code motion eval
 
 #
@@ -3348,7 +3349,7 @@ package DB ;
 
 use vars '$VERSION', '$header' ;
 
-$VERSION = '1.1056' ;
+$VERSION = '1.1059' ;
 $header = "ptkdb.pm version $DB::VERSION";
 $DB::window->{current_file} = "" ;
 
@@ -3801,11 +3802,11 @@ sub breakPointEvalExpr {
 # to properly interpret the vars
 #
 sub dbeval {
-    my ($package, $expr) = @_ ;
-    my (@result, $str, $saveW) ;
+    my ($ptkdb__package, $ptkdb__expr) = @_ ;
+    my (@ptkdb__result, $ptkdb__str, $ptkdb__saveW) ;
 
     no strict ;
-    $saveW = $^W ; # save the state of the "warning"(-w) flag
+    $ptkdb__saveW = $^W ; # save the state of the "warning"(-w) flag
     $^W = 0 ;
 
     #
@@ -3814,25 +3815,25 @@ sub dbeval {
     # An expression of %hash results in a
     # list of key/value pairs.  
     #
-    $expr =~ s/\s*%/\\%/o ;
+    $ptkdb__expr =~ s/\s*%/\\%/o ;
 
-    @result = eval <<__EVAL__ ;
+    @ptkdb__result = eval <<__EVAL__ ;
 
     \$\@ = \$DB::save_err ;
 
-    package $package ;
+    package $ptkdb__package ;
 
-    $expr ;
+    $ptkdb__expr ;
 
 __EVAL__
 
-    @result = ("ERROR ($@)") if $@ ;
+    @ptkdb__result = ("ERROR ($@)") if $@ ;
 
-    $^W = $saveW ; # restore the state of the "warning"(-w) flag
+    $^W = $ptkdb__saveW ; # restore the state of the "warning"(-w) flag
 
     use strict ;
 
-    return @result ;
+    return @ptkdb__result ;
 } # end of dbeval
 
 #
@@ -4065,5 +4066,4 @@ sub sub {
 } # end of sub 
 
 1 ; # return true value
-
 __EOF__
