@@ -278,7 +278,7 @@ Devel::ptkdb - Perl debugger using a Tk GUI
 
 =item Stop On Warning
 
-When -w is enabled the debugger will stop when warnings such as, "Use
+When C<-w> is enabled the debugger will stop when warnings such as, "Use
 of uninitialized value at undef_warn.pl line N" are encountered.  The debugger
 will stop on the NEXT line of execution since the error can't be detected
 until the current line has executed.  
@@ -649,6 +649,7 @@ Matthew Persico		 For suggestions, and beta testing.
 
 require 5.004 ;
 use Tk 400.000 ;
+use Data::Dumper ;
 require Tk ;
 require Tk::Dialog;
 require Tk::TextUndo ;
@@ -765,7 +766,7 @@ sub BEGIN {
 	 # various "functions".	This call will also
 	 # load the subroutines needed.
 	 #
- $Devel::ptkdb::DataDumperAvailable = check_avail("Data/Dumper.pm", "Dumper") ;
+ $Devel::ptkdb::DataDumperAvailable = 1 ; # assuming that it is now
  $Devel::ptkdb::useDataDumperForEval = $Devel::ptkdb::DataDumperAvailable ;
 
 	 #
@@ -3324,7 +3325,7 @@ package DB ;
 
 use vars '$VERSION', '$header' ;
 
-$VERSION = '1.1067' ;
+$VERSION = '1.107' ;
 $header = "ptkdb.pm version $DB::VERSION";
 $DB::window->{current_file} = "" ;
 
@@ -3369,8 +3370,6 @@ sub checkdbline($$) {
 	my ($fname, $lineno) = @_ ;
 
 	return 0 unless $fname; # we're getting an undef here on 'Restart...'
-
-	carp "check dbline on $fname" ;
 
 	local(*dbline) = $main::{'_<' . $fname} ;
 

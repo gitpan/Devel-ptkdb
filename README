@@ -1,4 +1,12 @@
 
+1.107   Release
+
+1.1068  Fixed a minor warning put out by pod2man during installation that's been grating
+        on the terminally pedantic.  
+
+        Data::Dumper is now a requirement for running.  This has been included with perl
+        since 5.00505.
+
 1.1067  Fixed a problem where ptkdb would not evaluate an expression such as 'keys %hash' in
 	its expression window.
 
@@ -39,16 +47,66 @@ evaluation and package browsing.
 
 Installation:
 
-   You can either use the MakeMaker interface:
+   You  use the MakeMaker interface:
 
 perl Makefile.PL
 make
 make install
 
-    Or you can use the GUI installer:
+If worse comes to worse you can simply copy the ptkdb.pm file into 
+cp ptkdb.pm /usr/local/lib/perl5/5.xxx/Devel/ptkdb.pm
 
-gunzip install_ptkdb.pl.gz
-perl install_ptkdb.pl
+On Windows:
+
+copy ptkdb.pm C:\perl\5.x\lib\Devel\ptkdb.pm
+
+To Test:
+
+perl -d:ptkdb -e 1
+
+
+
+
+Installing Tk:
+
+   In order to use ptkdb you must first install PerlTk.
+
+Using the CPAN module:
+
+   perl -MCPAN -e "install Tk"
+
+Using the Active State PPM Module:
+
+   ppm
+   > install Tk
+
+      or
+
+   retrieve the latest Tk archive from CPAN (Tk800.022 as of this writing)
+
+   http://www.perl.com/CPAN/modules/by-category/08_User_Interfaces/Tk/
+
+UNIX:
+
+   gunzip Tk800.022.tar.gz
+   tar xf Tk800.022.tar
+   cd Tk800.022
+   perl Makefile.PL
+   make 
+# This may require su or root permissions
+   make install
+
+Win32:
+
+   # Unix WinZip to extract the Tk archive
+   using Visual C++:
+
+   perl Makefile.PL
+   nmake 
+   nmake install
+
+
+
 
 Revision history for Perl extension Devel::ptkdb.
 
