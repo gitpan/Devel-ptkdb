@@ -124,7 +124,7 @@ Features include:
 
 To debug a script using ptkdb invoke perl like this:
 
-  perl -d:ptkdb1048 myscript.pl
+  perl -d:ptkdb myscript.pl
 
 =head1 Usage
 
@@ -657,10 +657,7 @@ sub BEGIN {
   @Devel::ptkdb::code_text_font = $ENV{'PTKDB_CODE_FONT'} ? ( "-font" => $ENV{'PTKDB_CODE_FONT'} ) : () ;
 
   @Devel::ptkdb::expression_text_font = $ENV{'PTKDB_EXPRESSION_FONT'} ? ( "-font" => $ENV{'PTKDB_EXPRESSION_FONT'} ) : () ;
-  $Devel::ptkdb::italic_text_font = $ENV{'PTKDB_CODE_FONT_EXPRESSION'} || '-*-courier-medium-i-*-*-*-100-*-*-*-*-*-*' ; # used to annotate lines with expressions
   @Devel::ptkdb::eval_text_font = $ENV{'PTKDB_EVAL_FONT'} ? ( -font => $ENV{'PTKDB_EVAL_FONT'} ) : () ; # text for the expression eval window
-
-  @Devel::ptkdb::brkExprTagCfg = ( -font => $Devel::ptkdb::italic_text_font, 'background' =>  $Devel::ptkdb::brkpt_text_color ) ; # text config for expressions on conditionnal breakpoints
 
   $Devel::ptkdb::eval_dump_indent = $ENV{'PTKDB_EVAL_DUMP_INDENT'} || 1 ;
 
@@ -1817,7 +1814,8 @@ sub configure_text {
   
   if ( $Devel::ptkdb::DataDumperAvailable ) {
     $self->{'balloon_dumper'} = new Data::Dumper([$place_holder]) ;
-    $self->{'balloon_dumper'}->Terse(1)->Indent($Devel::ptkdb::eval_dump_indent) ;
+    $self->{'balloon_dumper'}->Terse(1) ;
+    $self->{'balloon_dumper'}->Indent($Devel::ptkdb::eval_dump_indent) ;
   }
   
   $self->{'expr_ballon_msg'} = ' ' ;
@@ -1835,7 +1833,6 @@ sub configure_text {
   my $stopFnt = $mw->optionGet("stopfont", "background") || $ENV{'PTKDB_STOP_TAG_FONT'} ;
   push @stopTagConfig, ( -font => $stopFnt ) if $stopFnt ; # user may not have specified a font, if not, stay with the default
   
-  $txt->tagConfigure('brkPtExpr', @Devel::ptkdb::brkExprTagCfg) ;
   $txt->tagConfigure('stoppt', @stopTagConfig) ;
   $txt->tagConfigure('search_tag', "-background" => $mw->optionGet("searchtagcolor", "background") || "green") ;
   
@@ -3089,7 +3086,7 @@ package DB ;
 
 use vars '$VERSION', '$header' ;
 
-$VERSION = '1.1' ;
+$VERSION = '1.101' ;
 $header = "ptkdb.pm version $DB::VERSION";
 $DB::window->{current_file} = "" ;
 

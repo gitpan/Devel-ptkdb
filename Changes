@@ -3,3 +3,13 @@ Revision history for Perl extension Devel::ptkdb.
 1.1  Mon Dec  7 14:36:17 1998
 	- original version; created by h2xs 1.18
 
+1.101 Tue Dec 15 16:00 1998
+
+       Corrected POD document to change -d:ptkdb1048 to -d:ptkdb
+
+       Removed Dead code for font specifications and tag configuration
+       that is no longer used
+
+       Broke up a chained call to Data::Dumper->Terse->Ident into 
+       two separate calls to make it compatible with older versions
+       of Data::Dumper
