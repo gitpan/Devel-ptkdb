@@ -110,7 +110,7 @@ package Devel::ptkdb ;
 
 Devel::ptkdb - Perl debugger using a Tk GUI
 
-		=head1 DESCRIPTION
+=head1 DESCRIPTION
 
 		ptkdb is a debugger for perl that uses perlTk for a user interface.
 		Features include:
@@ -121,25 +121,25 @@ Devel::ptkdb - Perl debugger using a Tk GUI
 		Subroutine Tree
 		
 
-		=begin html
+=begin html
 
 		<body bgcolor=white>
 
-		=end html
+=end html
 
-		=head1 SYNOPSIS
+=head1 SYNOPSIS
 
 		To debug a script using ptkdb invoke perl like this:
 
 		perl -d:ptkdb myscript.pl
 
-		=head1 Usage
+=head1 Usage
 
 		perl -d:ptkdb myscript.pl
 
-		=head2 Code Pane
+=head2 Code Pane
 
-		=item Line Numbers
+=item Line Numbers
 
 		Line numbers are presented on the left side of the window.	Lines that
 		have lines through them are not breakable.	Lines that are plain text
@@ -150,7 +150,7 @@ Devel::ptkdb - Perl debugger using a Tk GUI
 		the controls on the BrkPt notebook page the color will change to
 		$ENV{'PTKDB_DISABLEDBRKPT_COLOR'}(Defaults to Green).
 
-		=item Cursor Motion
+=item Cursor Motion
 
 		If you place the cursor over a variable (i.e. $myVar, @myVar, or
 																						 %myVar) and pause for a second the debugger will evaluate the current
@@ -162,9 +162,9 @@ Devel::ptkdb - Perl debugger using a Tk GUI
 		that selection will be evaluated.
 
 
-		=head2 Notebook Pane
+=head2 Notebook Pane
 
-		=item Exprs
+=item Exprs
 
 		This is a list of expressions that are evaluated each time the debugger stops.	The results
 		of the expresssion are presented heirarchically for expression that result in hashes or lists.
@@ -175,13 +175,13 @@ Devel::ptkdb - Perl debugger using a Tk GUI
 		The B<Quick Expr> entry, will take an expression, evaluate it, and replace the entries
 		contents with the result.	 The result is also transfered to the 'clipboard' for pasting.
 
-		=item Subs
+=item Subs
 
 		Displays a list of all the packages invoked with the script heirarchially.	At the bottom
 		of the heirarchy are the subroutines within the packages.	 Double click on a package to
 		expand it.	Subroutines are listed by their full package names.	 
 
-		=item BrkPts
+=item BrkPts
 
 		Presents a list of the breakpoints current in use.	The pushbutton allows a breakpoint to
 		be 'disabled' without removing it.	Expressions can be applied to the breakpoint.	 If the
@@ -189,21 +189,21 @@ Devel::ptkdb - Perl debugger using a Tk GUI
 		will stop the script.	 Pressing the 'Goto' button will set the text pane to that file and
 		line where the breakpoint is set.	 Pressing the 'Delete' button will delete the breakpoint.
 
-		=head1 Menus
+=head1 Menus
 
-		=head2 File Menu
+=head2 File Menu
 
-		=item About...
+=item About...
 
 		Presents a dialog box telling you about the version of ptkdb.	 It recovers
 		your OS name, version of perl, version of Tk, and some other information
 
-		=item Open
+=item Open
 
 		Presents a list of files that are part of the invoked perl script.	Selecting
 		a file from this list will present this file in the text window.	
 
-		=item Save Config...
+=item Save Config...
 
 		Requires Data::Dumper.	Prompts for a filename to save the configuration to.	Saves
 		the breakpoints, expressions, eval text and window geometry.	If the name given as
@@ -212,88 +212,101 @@ Devel::ptkdb - Perl debugger using a Tk GUI
 
 		B<NOTE:>	You may find this preferable to using 
 
-		=item Restore Config...
+=item Restore Config...
 
 		Requires Data::Dumper.	Prompts for a filename to restore a configuration saved with
 		the "Save Config..." menu item.	 
 
-		=item Goto Line...
+=item Goto Line...
 
 		Prompts for a line number.	Pressing the "Okay" button sends the window to the line number entered.
 
-		=item Find Text...
+=item Find Text...
 
 		Prompts for text to search for.	 Options include forward search, backwards search, and regular expression
 		searching.	
 
-		=item Quit
+=item Quit
 
 		Causes the debugger and the target script to exit.	
 
-		=head2 Control Menu
+=head2 Control Menu
 
-		=item Run
+=item Run
 
 		The debugger allows the script to run to the next breakpoint or until the script exits.
 
-		=item Run To Here
+=item Run To Here
 
 		Runs the debugger until it comes to wherever the insertion cursor in text window
 		is placed.
 
-		=item Set Breakpoint
+=item Set Breakpoint
 
 		Sets a breakpoint on the line at the insertion cursor.	
 
-		=item Clear Breakpoint
+=item Clear Breakpoint
 
 		Remove a breakpoint on the at the insertion cursor.	 
 
-		=item Clear All Breakpoints
+=item Clear All Breakpoints
 
 		Removes all current breakpoints
 
-		=item Step Over
+=item Step Over
 
 		Causes the debugger to step over the next line.	 If the line
 		is a subroutine call it steps over the call, stopping when
 		the subroutine returns.	 
 
-		=item Step In
+=item Step In
 
 		Causes the debugger to step into the next line.	 If the line
 		is a subroutine call it steps into the subroutine, stopping
 		at the first executable line within the subroutine.	 
 
-		=item Return
+=item Return
 
 		Runs the script until it returns from the currently executing
 		subroutine.	 
 
-		=item Restart
+=item Restart
 
-		Saves the breakpoints and expressions in a temporary file and restarts the script from the beginning.
-	CAUTION:   This feature will not work properly with debugging of CGI Scripts.
+		Saves the breakpoints and expressions in a temporary file and
+	restarts the script from the beginning.  CAUTION: This feature will
+	not work properly with debugging of CGI Scripts.
 
+=item Stop On Warning
 
-		=head2 Data Menu
+When -w is enabled the debugger will stop when warnings such as, "Use
+of uninitialized value at undef_warn.pl line N" are encountered.  The debugger
+will stop on the NEXT line of execution since the error can't be detected
+until the current line has executed.  
 
-		=item Enter Expression
+This feature can be turned on at startup by adding:
+
+$DB::ptkdb::stop_on_warning = 1 ;
+
+to a .ptkdbrc file
+
+=head2 Data Menu
+
+=item Enter Expression
 
 		When an expression is entered in the "Enter Expression:" text box, selecting
 		this item will enter the expression into the expression list.	 Each time the
 		debugger stops this expression will be evaluated and its result updated in
 		the list window.
 
-		=item Delete Expression
+=item Delete Expression
 
 		Deletes the highlighted expression in the expression window.
 
-		=item Delete All Expressions
+=item Delete All Expressions
 
 		Delete all expressions in the expression window.
 
-		=item Expression Eval Window
+=item Expression Eval Window
 
 		Pops up a two pane window.	Expressions of virtually unlimitted length
 		can be entered in the top pane.	 Pressing the 'Eval' button will cause
@@ -303,27 +316,27 @@ Data::Dumper is available it will be used to format the resulting
 
 HINT:	 You can enter multiple expressions by separating them with commas.	 
 
-		=item Use Data::Dumper for Eval Window
+=item Use Data::Dumper for Eval Window
 
 		Enables or disables the use of Data::Dumper for formatting the results
 		of expressions in the Eval window.	
 
 
-		=head2 Stack Menu
+=head2 Stack Menu
 
 		Maintains a list of the current subroutine stack each time the debugger
 		stops.	Selecting an item from this menu will set the text in the code
 		window to that particular subourtine entry point.	 
 
-		=head2 Bookmarks Menu
+=head2 Bookmarks Menu
 
 		Maintains a list of bookmarks.	The booksmarks are saved in ~/.ptkdb_bookmarks
 
-		=item Add Bookmark
+=item Add Bookmark
 
 		Adds a bookmark to the bookmark list.	 
 
-		=head1 Options
+=head1 Options
 
 		Here is a list of the current active XResources options.	Several
 		of these can be overridden with environmental variables.	Resources
@@ -405,69 +418,69 @@ HINT:	 You can enter multiple expressions by separating them with commas.
 
 
 
-		=head1 Environmental Variables
+=head1 Environmental Variables
 
-		=over 4
+=over 4
 
-		=item PTKDB_BRKPT_COLOR
+=item PTKDB_BRKPT_COLOR
 
 		Sets the background color of a set breakpoint
 
-		=item PTKDB_DISABLEDBRKPT_COLOR
+=item PTKDB_DISABLEDBRKPT_COLOR
 
 		Sets the background color of a disabled breakpoint
 
-		=item PTKDB_CODE_FONT
+=item PTKDB_CODE_FONT
 
 		Sets the font of the Text in the code pane.
 
-		=item PTKDB_CODE_SIDE
+=item PTKDB_CODE_SIDE
 
 		Sets which side the code pane is packed onto.	 Defaults to 'left'.
 		Can be set to 'left', 'right', 'top', 'bottom'.	 
 
 		Overrides the Xresource ptkdb*codeside: I<side>. 
 
-		=item PTKDB_EXPRESSION_FONT
+=item PTKDB_EXPRESSION_FONT
 
 		Sets the font used in the expression notebook page.
 
-		=item PTKDB_EVAL_FONT
+=item PTKDB_EVAL_FONT
 
 		Sets the font used in the Expression Eval Window
 
-		=item PTKDB_EVAL_DUMP_INDENT
+=item PTKDB_EVAL_DUMP_INDENT
 
 		Sets the value used for Data::Dumper 'indent' setting.	See man Data::Dumper
 
-		=item PTKDB_SCROLLBARS_ONRIGHT
+=item PTKDB_SCROLLBARS_ONRIGHT
 
 		A non-zero value Sets the scrollbars of all windows to be on the right side of the window.	Useful
 		for Windows users using ptkdb in an XWindows environment.	 
 
-		=item PTKDB_LINENUMBER_FORMAT
+=item PTKDB_LINENUMBER_FORMAT
 
 		Sets the format of line numbers on the left side of the window.	 Default value is %05d.	 useful
 		if you have a script that contains more than 99999 lines.	 
 
-		=item PTKDB_DISPLAY
+=item PTKDB_DISPLAY
 
 		Sets the X display that the ptkdb window will appear on when invoked.	 Useful for debugging CGI
 		scripts on remote systems.	
 
-		=item PTKDB_BOOKMARKS_PATH
+=item PTKDB_BOOKMARKS_PATH
 
 		Sets the path of the bookmarks file.	Default is $ENV{'HOME'}/.ptkdb_bookmarks
 
-		=item PTKDB_STOP_TAG_COLOR
+=item PTKDB_STOP_TAG_COLOR
 
 		Sets the color that highlights the line where the debugger is stopped 
 
-		=back
+=back
 
-		=head1 FILES
+=head1 FILES
 
-		=head2 .ptkdbrc
+=head2 .ptkdbrc
 
 		If this file is present in ~/ or in the directory where perl is invoked the file will
 		be read and executed as a perl script before the debugger makes its initial stop at startup.	
@@ -477,31 +490,31 @@ HINT:	 You can enter multiple expressions by separating them with commas.
 
 		There is a system ptkdbrc file in $PREFIX/lib/perl5/$VERS/Devel/ptkdbrc
 
-		=over 4
+=over 4
 
-		=item brkpt($fname, @lines)
+=item brkpt($fname, @lines)
 
 		Sets breakspoints on the list of lines in $fname.	 A warning message is generated
 		if a line is not breakable.	 
 
-		=item condbrkpt($fname, @($line, $expr) ) 
+=item condbrkpt($fname, @($line, $expr) ) 
 
 		Sets conditional breakpoints in $fname on pairs of $line and $expr.	A warning message is generated
 		if a line is not breakable.	 NOTE:	the validity of the expression will not be determined until execution
 		of that particular line.	
 
-		=item brkonsub(@names)
+=item brkonsub(@names)
 
 		Sets a breakpoint on each subroutine name listed.	A warning message is generated
 		if a subroutine does not exist.	 NOTE:	for a script with no other packages the default
 		package is "main::" and the subroutines would be "main::mySubs".	
 
-		=item brkonsub_regex(@regExprs)
+=item brkonsub_regex(@regExprs)
 
 		Uses the list of @regExprs as a list of regular expressions to set breakpoints.	 Sets breakpoints 
 		on every subroutine that matches any of the listed regular expressions.
 
-		=item textTagConfigure(tag, ?option?, ?value?)
+=item textTagConfigure(tag, ?option?, ?value?)
 
 		Allows the user to format the text in the code window.	The option
 		value pairs are the same values as the option for the tagConfigure
@@ -542,9 +555,9 @@ Example:
 
 =back
 
-		=head1 NOTES
+=head1 NOTES
 
-		=head2 Debugging Other perlTk Applications
+=head2 Debugging Other perlTk Applications
 
 		ptkdb can be used to debug other perlTk applications if some
 		cautions are observed.	Basically, do not click the mouse in the
@@ -571,7 +584,7 @@ Example:
 		debugger is active, and debugger events will not be processed while
 		the target script is active.
 
-		=head2 Debugging CGI Scripts
+=head2 Debugging CGI Scripts
 
 		One advantage of ptkdb over the builtin debugger(-d) is that it can
 		be used to debug CGI perl scripts as they run on a web server.	Be
@@ -689,7 +702,7 @@ sub BEGIN {
  $Devel::ptkdb::pathSep = '\x00' ;
  $Devel::ptkdb::pathSepReplacement = "\0x01" ;
 
- @Devel::ptkdb::step_in_keys		= ( '<Shift-F9>', '<Alt-s>', '<Button-3>' ) ; # step into a subroutine
+ @Devel::ptkdb::step_in_keys = ( '<Shift-F9>', '<Alt-s>', '<Button-3>' ) ; # step into a subroutine
  @Devel::ptkdb::step_over_keys = ( '<F9>', '<Alt-n>', '<Shift-Button-3>' ) ; # step over a subroutine
  @Devel::ptkdb::return_keys		= ( '<Alt-u>', '<Control-Button-3>' ) ; # return from a subroutine
  @Devel::ptkdb::toggle_breakpt_keys = ( '<Alt-b>' ) ; # set or unset a breakpoint
@@ -890,8 +903,30 @@ sub setTabs {
 # the expression list window.	 
 #
 sub add_exprs {
-	push @{$DB::window->{'expr_list'}}, map { 'expr' => $_, 'depth' => $Devel::ptkdb::expr_depth }, @_
-		} # end of add_exprs
+	push @{$DB::window->{'expr_list'}}, map { 'expr' => $_, 'depth' => $Devel::ptkdb::expr_depth }, @_ ;
+} # end of add_exprs
+
+
+##
+## register a subroutine reference that will be called whenever
+## ptkdb sets up it's windows
+##
+sub register_user_window_init {
+	push @{$DB::window->{'user_window_init_list'}}, @_ ;
+} # end of register_user_window_init
+
+##
+## register a subroutine reference that will be called whenever
+## ptkdb enters from code
+##
+sub register_user_DB_entry {
+	push @{$DB::window->{'user_window_DB_entry_list'}}, @_ ;
+} # end of register_user_DB_entry
+
+sub get_notebook_widget {
+	return $DB::window->{'notebook'} ;
+} # end of get_notebook_widget
+
 
 #
 # Run files provided by the user
@@ -923,6 +958,8 @@ sub do_user_init_files {
 	if( $@ ) {
 		print "User init file .ptkdbrc failed: $@\n" ;
 	}
+
+	&set_stop_on_warning() ;
 }
 
 #
@@ -952,6 +989,9 @@ sub new {
 	$self->{'brkPtSlots'} = [] ; # open slots for adding breakpoints to the table 
 
 	$self->{'main_window'} = undef ;
+
+	$self->{'user_window_init_list'} = [] ;
+	$self->{'user_window_DB_entry_list'} = [] ;
 
 	$self->setup_main_window() ;
 
@@ -1167,7 +1207,8 @@ sub setup_menu_bar {
 
 	my $stepOverSub = sub { &DB::SetStepOverBreakPoint(0) ; 
 												$DB::single = 1 ; 
-												$DB::window->{'event'} = 'step' ; } ;
+												$DB::window->{'event'} = 'step' ; 
+												} ;
 	
 
 	my $stepInSub = sub { 
@@ -1197,6 +1238,8 @@ sub setup_menu_bar {
 						 [ 'command' => 'Return', -accelerator => 'Alt+U', -underline => 3, -command => $returnSub ],
 						 '-',
 						 [ 'command' => 'Restart...', -accelerator => 'Ctrl-r', -underline => 0, -command => \&Devel::ptkdb::DoRestart ],
+						 '-',
+						 [ 'checkbutton' => 'Stop On Warning', -variable => \$DB::ptkdb::stop_on_warning, -command => \&set_stop_on_warning ]
 
 						 
 							 ] ; # end of control menu items
@@ -2473,7 +2516,7 @@ sub set_file {
 	$self->{'line_offset'} = $offset ;
 
 	$text = $self->{'text'} ;
-
+	 
 	if( $fname eq $self->{current_file} ) {
 		$self->set_line($line) ;
 		return ;
@@ -2773,8 +2816,10 @@ sub main_loop {
 	my ($evt, $str, $result) ;
 	my $i = 0;
  SWITCH: for ($self->{'event'} = 'null' ; ; $self->{'event'} = undef ) {
- Tk::DoOneEvent(0);
+
+   Tk::DoOneEvent(0);
 	 next unless $self->{'event'} ;
+
 	 $evt = $self->{'event'} ;
 	 $evt =~ /step/o && do { last SWITCH ; } ;
 	 $evt =~ /null/o && do { next SWITCH ; } ;
@@ -3181,12 +3226,12 @@ sub code_motion_eval {
 # In other words when the target script 'stops'
 # in the Debugger
 #
-		sub EnterActions {
-			my($self) = @_ ;
+sub EnterActions {
+	my($self) = @_ ;
 
-#		 $self->{'main_window'}->Unbusy() ;
+#	 $self->{'main_window'}->Unbusy() ;
 
-		} # end of EnterActions
+} # end of EnterActions
 
 #
 # Subroutine called when we return from DB::DB()
@@ -3235,13 +3280,39 @@ sub DoRestart {
 
 } # end of DoRestart
 
+##
+## Enables/Disables the feature where we stop
+## if we've encountered a perl warning such as:
+## "Use of uninitialized value at undef_warn.pl line N"
+##
+
+sub stop_on_warning_cb {
+	&$DB::ptkdb::warn_sig_save() if $DB::ptkdb::warn_sig_save ; # call any previously registered warning
+ $DB::window->DoAlert(@_) ;
+ $DB::single = 1 ; # forces debugger to stop next time
+}
+
+sub set_stop_on_warning {
+
+	if( $DB::ptkdb::stop_on_warning ) {
+		
+		return if $DB::ptkdb::warn_sig_save == \&stop_on_warning_cb ; # prevents recursion
+
+	  $DB::ptkdb::warn_sig_save = $SIG{'__WARN__'} if $SIG{'__WARN__'} ;
+		$SIG{'__WARN__'} = \&stop_on_warning_cb ;
+		 }
+	else {
+		$SIG{'__WARN__'} = $DB::ptkdb::warn_sig_save ;
+	}
+} # end of set_stop_on_warning
+
 1 ; # end of Devel::ptkdb
 
 package DB ;
 
 use vars '$VERSION', '$header' ;
 
-$VERSION = '1.1064' ;
+$VERSION = '1.1065' ;
 $header = "ptkdb.pm version $DB::VERSION";
 $DB::window->{current_file} = "" ;
 
@@ -3796,8 +3867,6 @@ sub DB {
 	 my ($package, $filename, $line) = caller ;
 	 my ($stop, $cnt) ;
 
-	 # print "DB::DB called from $package, $filename, $line\n" ;
-
 	 &DB::Initialize($filename) unless $DB::ptkdb::isInitialized ; # do some setup stuff our first time through
 
 	 if (!isBreakPoint($filename, $line, $package) ) {
@@ -3806,14 +3875,14 @@ sub DB {
 		 return ;
 	 }
 
+	 
+
 	 if ( !$DB::window ) { # not setup yet
 		 $@ = $DB::save_err ;
 		 return ;
 	 }
 
  $DB::window->setup_main_window() unless $DB::window->{'main_window'} ;
-
-
 
  $DB::window->EnterActions() ; 
 
@@ -3822,7 +3891,6 @@ sub DB {
 	 $^P = 0 ;
 
  $DB::on = 1 ;
-
 
 #
 # The user can specify this variable in one of the startup files,
@@ -3841,7 +3909,7 @@ sub DB {
 		 $SIG{'INT'} = "DB::dbexit" unless	 $DB::dbint_handler_save ;
 	 }
 
- $DB::window->{main_window}->raise() ; # bring us to the top make sure OUR event loop runs
+  #$DB::window->{main_window}->raise() ; # bring us to the top make sure OUR event loop runs
  $DB::window->{main_window}->focus() ;
 
  $DB::window->set_file($filename, $line) ;
