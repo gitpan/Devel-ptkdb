@@ -1,4 +1,11 @@
 
+1.1075   Fix for perl 5.8.0.  Fixes to doc formatting.  $^W saves now done
+         with local($^W).  Overdue correction for @_ context save.
+
+
+1.1075beta   Expedient fix for perl 5.8.0
+
+
 1.1074  Fixed deficiency where the 'Exprs' pane would not display or decomposed the 
         members of a blessed array.  
 

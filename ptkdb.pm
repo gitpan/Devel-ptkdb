@@ -1,3 +1,14 @@
+
+package DB ;
+
+##
+## Expedient fix for perl 5.8.0.  True DB::DB is further down.
+## 
+##
+sub DB {}
+
+use Tk ;
+
 #
 # If you've loaded this file via a browser
 # select "Save As..." from your file menu
@@ -112,8 +123,8 @@ Devel::ptkdb - Perl debugger using a Tk GUI
 
 =head1 DESCRIPTION
 
-		ptkdb is a debugger for perl that uses perlTk for a user interface.
-		Features include:
+  ptkdb is a debugger for perl that uses perlTk for a user interface.
+	Features include:
 
 		Hot Variable Inspection
 		Breakpoint Control Panel
@@ -129,7 +140,7 @@ Devel::ptkdb - Perl debugger using a Tk GUI
 
 =head1 SYNOPSIS
 
-		To debug a script using ptkdb invoke perl like this:
+To debug a script using ptkdb invoke perl like this:
 
 		perl -d:ptkdb myscript.pl
 
@@ -137,144 +148,163 @@ Devel::ptkdb - Perl debugger using a Tk GUI
 
 		perl -d:ptkdb myscript.pl
 
-=head2 Code Pane
+=head1 Code Pane
+
+=over 4
 
 =item Line Numbers
 
-		Line numbers are presented on the left side of the window.	Lines that
-		have lines through them are not breakable.	Lines that are plain text
-		are breakable.	Clicking on these line numbers will insert a
-		breakpoint on that line and change the line number color to
-		$ENV{'PTKDB_BRKPT_COLOR'} (Defaults to Red).	Clicking on the number
-		again will remove the breakpoint.	 If you disable the breakpoint with
-		the controls on the BrkPt notebook page the color will change to
-		$ENV{'PTKDB_DISABLEDBRKPT_COLOR'}(Defaults to Green).
+ Line numbers are presented on the left side of the window. Lines that
+ have lines through them are not breakable. Lines that are plain text
+ are breakable. Clicking on these line numbers will insert a
+ breakpoint on that line and change the line number color to
+ $ENV{'PTKDB_BRKPT_COLOR'} (Defaults to Red). Clicking on the number
+ again will remove the breakpoint.  If you disable the breakpoint with
+ the controls on the BrkPt notebook page the color will change to
+ $ENV{'PTKDB_DISABLEDBRKPT_COLOR'}(Defaults to Green).
 
 =item Cursor Motion
 
-		If you place the cursor over a variable (i.e. $myVar, @myVar, or
-																						 %myVar) and pause for a second the debugger will evaluate the current
-		value of the variable and pop a balloon up with the evaluated
-		result. I<This feature is not available with Tk400.>
+If you place the cursor over a variable (i.e. $myVar, @myVar, or
+%myVar) and pause for a second the debugger will evaluate the current
+value of the variable and pop a balloon up with the evaluated
+result. I<This feature is not available with Tk400.>
 
-		If Data::Dumper(standard with perl5.00502)is available it will be used
-		to format the result.	 If there is an active selection, the text of
-		that selection will be evaluated.
+If Data::Dumper(standard with perl5.00502)is available it will be used
+to format the result.  If there is an active selection, the text of
+that selection will be evaluated.
 
+=back
 
-=head2 Notebook Pane
+=head1 Notebook Pane
+
+=over 2
 
 =item Exprs
 
-		This is a list of expressions that are evaluated each time the debugger stops.	The results
-		of the expresssion are presented heirarchically for expression that result in hashes or lists.
-		Double clicking on such an expression will cause it to collapse; double clicking again
-		will cause the expression to expand.	Expressions are entered through B<Enter Expr> entry,
-		or by Alt-E when text is selected in the code pane.
+ This is a list of expressions that are evaluated each time the
+ debugger stops. The results of the expresssion are presented
+ heirarchically for expression that result in hashes or lists.  Double
+ clicking on such an expression will cause it to collapse; double
+ clicking again will cause the expression to expand. Expressions are
+ entered through B<Enter Expr> entry, or by Alt-E when text is
+ selected in the code pane.
 
-		The B<Quick Expr> entry, will take an expression, evaluate it, and replace the entries
-		contents with the result.	 The result is also transfered to the 'clipboard' for pasting.
+ The B<Quick Expr> entry, will take an expression, evaluate it, and
+ replace the entries contents with the result.  The result is also
+ transfered to the 'clipboard' for pasting.
 
 =item Subs
 
-		Displays a list of all the packages invoked with the script heirarchially.	At the bottom
-		of the heirarchy are the subroutines within the packages.	 Double click on a package to
-		expand it.	Subroutines are listed by their full package names.	 
+ Displays a list of all the packages invoked with the script
+ heirarchially. At the bottom of the heirarchy are the subroutines
+ within the packages.  Double click on a package to expand
+ it. Subroutines are listed by their full package names.
 
 =item BrkPts
 
-		Presents a list of the breakpoints current in use.	The pushbutton allows a breakpoint to
-		be 'disabled' without removing it.	Expressions can be applied to the breakpoint.	 If the
-		expression evaluates to be 'true'(results in a defined value that is not 0) the debugger
-		will stop the script.	 Pressing the 'Goto' button will set the text pane to that file and
-		line where the breakpoint is set.	 Pressing the 'Delete' button will delete the breakpoint.
+ Presents a list of the breakpoints current in use. The pushbutton
+ allows a breakpoint to be 'disabled' without removing it. Expressions
+ can be applied to the breakpoint.  If the expression evaluates to be
+ 'true'(results in a defined value that is not 0) the debugger will
+ stop the script.  Pressing the 'Goto' button will set the text pane
+ to that file and line where the breakpoint is set.  Pressing the
+ 'Delete' button will delete the breakpoint.
+
+=back
 
 =head1 Menus
 
 =head2 File Menu
 
+=over
+
 =item About...
 
-		Presents a dialog box telling you about the version of ptkdb.	 It recovers
-		your OS name, version of perl, version of Tk, and some other information
+Presents a dialog box telling you about the version of ptkdb.  It
+recovers your OS name, version of perl, version of Tk, and some other
+information
 
 =item Open
 
-		Presents a list of files that are part of the invoked perl script.	Selecting
-		a file from this list will present this file in the text window.	
+Presents a list of files that are part of the invoked perl
+script. Selecting a file from this list will present this file in the
+text window.
 
 =item Save Config...
 
-		Requires Data::Dumper.	Prompts for a filename to save the configuration to.	Saves
-		the breakpoints, expressions, eval text and window geometry.	If the name given as
-		the default is used and the script is reinvoked, this configuration will be reloaded
-		automatically.	
+Requires Data::Dumper. Prompts for a filename to save the
+configuration to. Saves the breakpoints, expressions, eval text and
+window geometry. If the name given as the default is used and the
+script is reinvoked, this configuration will be reloaded
+automatically.
 
 		B<NOTE:>	You may find this preferable to using 
 
 =item Restore Config...
 
-		Requires Data::Dumper.	Prompts for a filename to restore a configuration saved with
-		the "Save Config..." menu item.	 
+Requires Data::Dumper.	Prompts for a filename to restore a configuration saved with
+the "Save Config..." menu item.	 
 
 =item Goto Line...
 
-		Prompts for a line number.	Pressing the "Okay" button sends the window to the line number entered.
+Prompts for a line number.	Pressing the "Okay" button sends the window to the line number entered.
+item Find Text...
 
-=item Find Text...
-
-		Prompts for text to search for.	 Options include forward search, backwards search, and regular expression
-		searching.	
+Prompts for text to search for.  Options include forward search,
+backwards search, and regular expression searching.
 
 =item Quit
 
-		Causes the debugger and the target script to exit.	
+ Causes the debugger and the target script to exit.	
+
+=back
 
 =head2 Control Menu
 
+=over
+
 =item Run
 
-		The debugger allows the script to run to the next breakpoint or until the script exits.
+The debugger allows the script to run to the next breakpoint or until the script exits.
+item Run To Here
 
-=item Run To Here
-
-		Runs the debugger until it comes to wherever the insertion cursor in text window
-		is placed.
+Runs the debugger until it comes to wherever the insertion cursor
+in text window is placed.
 
 =item Set Breakpoint
 
-		Sets a breakpoint on the line at the insertion cursor.	
+Sets a breakpoint on the line at the insertion cursor.	
+item Clear Breakpoint
 
-=item Clear Breakpoint
-
-		Remove a breakpoint on the at the insertion cursor.	 
+Remove a breakpoint on the at the insertion cursor.
 
 =item Clear All Breakpoints
 
-		Removes all current breakpoints
+Removes all current breakpoints
 
 =item Step Over
 
-		Causes the debugger to step over the next line.	 If the line
-		is a subroutine call it steps over the call, stopping when
-		the subroutine returns.	 
+Causes the debugger to step over the next line.  If the line is a
+subroutine call it steps over the call, stopping when the subroutine
+returns.
 
 =item Step In
 
-		Causes the debugger to step into the next line.	 If the line
-		is a subroutine call it steps into the subroutine, stopping
-		at the first executable line within the subroutine.	 
+Causes the debugger to step into the next line.  If the line is a
+subroutine call it steps into the subroutine, stopping at the first
+executable line within the subroutine.
 
 =item Return
 
-		Runs the script until it returns from the currently executing
-		subroutine.	 
+Runs the script until it returns from the currently executing
+subroutine.	 
 
 =item Restart
 
-		Saves the breakpoints and expressions in a temporary file and
-	restarts the script from the beginning.  CAUTION: This feature will
-	not work properly with debugging of CGI Scripts.
+Saves the breakpoints and expressions in a temporary file and restarts
+the script from the beginning.  CAUTION: This feature will not work
+properly with debugging of CGI Scripts.
 
 =item Stop On Warning
 
@@ -289,61 +319,70 @@ $DB::ptkdb::stop_on_warning = 1 ;
 
 to a .ptkdbrc file
 
+=back
+
 =head2 Data Menu
+
+=over
 
 =item Enter Expression
 
-		When an expression is entered in the "Enter Expression:" text box, selecting
-		this item will enter the expression into the expression list.	 Each time the
-		debugger stops this expression will be evaluated and its result updated in
-		the list window.
+When an expression is entered in the "Enter Expression:" text box,
+selecting this item will enter the expression into the expression
+list.  Each time the debugger stops this expression will be evaluated
+and its result updated in the list window.
 
 =item Delete Expression
 
-		Deletes the highlighted expression in the expression window.
+ Deletes the highlighted expression in the expression window.
 
 =item Delete All Expressions
 
-		Delete all expressions in the expression window.
+ Delete all expressions in the expression window.
 
 =item Expression Eval Window
 
-		Pops up a two pane window.	Expressions of virtually unlimitted length
-		can be entered in the top pane.	 Pressing the 'Eval' button will cause
-		the expression to be evaluated and its placed in the lower pane.	If
+Pops up a two pane window. Expressions of virtually unlimitted length
+can be entered in the top pane.  Pressing the 'Eval' button will cause
+the expression to be evaluated and its placed in the lower pane. If
 Data::Dumper is available it will be used to format the resulting
-		text.	 Undo is enabled for the text in the upper pane.	
+text.  Undo is enabled for the text in the upper pane.
 
 HINT:	 You can enter multiple expressions by separating them with commas.	 
 
 =item Use Data::Dumper for Eval Window
 
-		Enables or disables the use of Data::Dumper for formatting the results
-		of expressions in the Eval window.	
+Enables or disables the use of Data::Dumper for formatting the results
+of expressions in the Eval window.	
 
+=back
 
 =head2 Stack Menu
 
-		Maintains a list of the current subroutine stack each time the debugger
-		stops.	Selecting an item from this menu will set the text in the code
-		window to that particular subourtine entry point.	 
+Maintains a list of the current subroutine stack each time the
+debugger stops. Selecting an item from this menu will set the text in
+the code window to that particular subourtine entry point.
 
 =head2 Bookmarks Menu
 
-		Maintains a list of bookmarks.	The booksmarks are saved in ~/.ptkdb_bookmarks
+Maintains a list of bookmarks.	The booksmarks are saved in ~/.ptkdb_bookmarks
+
+=over
 
 =item Add Bookmark
 
-		Adds a bookmark to the bookmark list.	 
+Adds a bookmark to the bookmark list.	 
+
+=back
 
 =head1 Options
 
-		Here is a list of the current active XResources options.	Several
-		of these can be overridden with environmental variables.	Resources
-		can be added to .Xresources or .Xdefaults depending on your X configuration.
-		To enable these resources you must either restart your X server or 
-		use the xrdb -override resFile command.	 xfontsel can be used to select
-		fonts.
+Here is a list of the current active XResources options. Several of
+these can be overridden with environmental variables. Resources can be
+added to .Xresources or .Xdefaults depending on your X configuration.
+To enable these resources you must either restart your X server or use
+the xrdb -override resFile command.  xfontsel can be used to select
+fonts.
 
 		/*
 		* Perl Tk Debugger XResources.	 
@@ -415,66 +454,64 @@ HINT:	 You can enter multiple expressions by separating them with commas.
 		*/	
 		ptkdb*searchtagcolor: green
 
-
-
-
 =head1 Environmental Variables
 
 =over 4
 
 =item PTKDB_BRKPT_COLOR
 
-		Sets the background color of a set breakpoint
+Sets the background color of a set breakpoint
 
 =item PTKDB_DISABLEDBRKPT_COLOR
 
-		Sets the background color of a disabled breakpoint
+Sets the background color of a disabled breakpoint
 
 =item PTKDB_CODE_FONT
 
-		Sets the font of the Text in the code pane.
+Sets the font of the Text in the code pane.
 
 =item PTKDB_CODE_SIDE
 
-		Sets which side the code pane is packed onto.	 Defaults to 'left'.
-		Can be set to 'left', 'right', 'top', 'bottom'.	 
+Sets which side the code pane is packed onto.	 Defaults to 'left'.
+Can be set to 'left', 'right', 'top', 'bottom'.	 
 
-		Overrides the Xresource ptkdb*codeside: I<side>. 
+Overrides the Xresource ptkdb*codeside: I<side>.
 
 =item PTKDB_EXPRESSION_FONT
 
-		Sets the font used in the expression notebook page.
+ Sets the font used in the expression notebook page.
 
 =item PTKDB_EVAL_FONT
 
-		Sets the font used in the Expression Eval Window
+ Sets the font used in the Expression Eval Window
 
 =item PTKDB_EVAL_DUMP_INDENT
 
-		Sets the value used for Data::Dumper 'indent' setting.	See man Data::Dumper
+ Sets the value used for Data::Dumper 'indent' setting.	See man Data::Dumper
 
 =item PTKDB_SCROLLBARS_ONRIGHT
 
-		A non-zero value Sets the scrollbars of all windows to be on the right side of the window.	Useful
-		for Windows users using ptkdb in an XWindows environment.	 
+ A non-zero value Sets the scrollbars of all windows to be on the
+ right side of the window. Useful for Windows users using ptkdb in an
+ XWindows environment.
 
 =item PTKDB_LINENUMBER_FORMAT
 
-		Sets the format of line numbers on the left side of the window.	 Default value is %05d.	 useful
-		if you have a script that contains more than 99999 lines.	 
+Sets the format of line numbers on the left side of the window.	 Default value is %05d.	 useful
+if you have a script that contains more than 99999 lines.	 
 
 =item PTKDB_DISPLAY
 
-		Sets the X display that the ptkdb window will appear on when invoked.	 Useful for debugging CGI
-		scripts on remote systems.	
+Sets the X display that the ptkdb window will appear on when invoked.	 Useful for debugging CGI
+scripts on remote systems.	
 
 =item PTKDB_BOOKMARKS_PATH
 
-		Sets the path of the bookmarks file.	Default is $ENV{'HOME'}/.ptkdb_bookmarks
+Sets the path of the bookmarks file.	Default is $ENV{'HOME'}/.ptkdb_bookmarks
 
 =item PTKDB_STOP_TAG_COLOR
 
-		Sets the color that highlights the line where the debugger is stopped 
+Sets the color that highlights the line where the debugger is stopped 
 
 =back
 
@@ -482,44 +519,48 @@ HINT:	 You can enter multiple expressions by separating them with commas.
 
 =head2 .ptkdbrc
 
-		If this file is present in ~/ or in the directory where perl is invoked the file will
-		be read and executed as a perl script before the debugger makes its initial stop at startup.	
-		There	 are several 'api' calls that can be used with such scripts.	There is an internal
-		variable $DB::no_stop_at_start that may be set to non-zero to prevent the debugger from
-		stopping at the first line of the script.	 This is useful for debugging CGI scripts.
+If this file is present in ~/ or in the directory where perl is
+invoked the file will be read and executed as a perl script before the
+debugger makes its initial stop at startup.  There are several 'api'
+calls that can be used with such scripts. There is an internal
+variable $DB::no_stop_at_start that may be set to non-zero to prevent
+the debugger from stopping at the first line of the script.  This is
+useful for debugging CGI scripts.
 
-		There is a system ptkdbrc file in $PREFIX/lib/perl5/$VERS/Devel/ptkdbrc
+There is a system ptkdbrc file in $PREFIX/lib/perl5/$VERS/Devel/ptkdbrc
 
 =over 4
 
 =item brkpt($fname, @lines)
 
-		Sets breakspoints on the list of lines in $fname.	 A warning message is generated
-		if a line is not breakable.	 
+Sets breakspoints on the list of lines in $fname.  A warning message
+is generated if a line is not breakable.
 
 =item condbrkpt($fname, @($line, $expr) ) 
 
-		Sets conditional breakpoints in $fname on pairs of $line and $expr.	A warning message is generated
-		if a line is not breakable.	 NOTE:	the validity of the expression will not be determined until execution
-		of that particular line.	
+Sets conditional breakpoints in $fname on pairs of $line and $expr. A
+warning message is generated if a line is not breakable.  NOTE: the
+validity of the expression will not be determined until execution of
+that particular line.
 
 =item brkonsub(@names)
 
-		Sets a breakpoint on each subroutine name listed.	A warning message is generated
-		if a subroutine does not exist.	 NOTE:	for a script with no other packages the default
-		package is "main::" and the subroutines would be "main::mySubs".	
+Sets a breakpoint on each subroutine name listed. A warning message is
+generated if a subroutine does not exist.  NOTE: for a script with no
+other packages the default package is "main::" and the subroutines
+would be "main::mySubs".
 
 =item brkonsub_regex(@regExprs)
 
-		Uses the list of @regExprs as a list of regular expressions to set breakpoints.	 Sets breakpoints 
-		on every subroutine that matches any of the listed regular expressions.
+Uses the list of @regExprs as a list of regular expressions to set breakpoints.	 Sets breakpoints 
+on every subroutine that matches any of the listed regular expressions.
 
 =item textTagConfigure(tag, ?option?, ?value?)
 
-		Allows the user to format the text in the code window.	The option
-		value pairs are the same values as the option for the tagConfigure
-		method documented in Tk::Text.	Currently the following tags are
-		in effect:
+Allows the user to format the text in the code window. The option
+value pairs are the same values as the option for the tagConfigure
+method documented in Tk::Text. Currently the following tags are in
+effect:
 
 		
 		'code'							 Format for code in the text pane
@@ -530,19 +571,19 @@ HINT:	 You can enter multiple expressions by separating them with commas.
 		'breakdisabledLine'	 Format applied to line numbers were a disabled breakpoint is set
 		'search_tag'				 Format applied to text when located by a search.	 
 
-Example:
+ Example:
 
-#
-# Turns off the overstrike on lines that you can't set a breakpoint on
-# and makes the text color yellow.	
-#
+ #
+ # Turns off the overstrike on lines that you can't set a breakpoint on
+ # and makes the text color yellow.	
+ #
 		textTagConfigure('nonbreakableLine', -overstrike => 0, -foreground => "yellow") ;
 
 =item add_exprs(@exprList)
 
-		Add a list of expressions to the 'Exprs' window.	NOTE: use the single
-		quote character \' to prevent the expression from being "evaluated" in
-		the string context.
+Add a list of expressions to the 'Exprs' window. NOTE: use the single
+quote character \' to prevent the expression from being "evaluated" in
+the string context.
 
 
 	Example:
@@ -559,73 +600,76 @@ Example:
 
 =head2 Debugging Other perlTk Applications
 
-		ptkdb can be used to debug other perlTk applications if some
-		cautions are observed.	Basically, do not click the mouse in the
-		application's window(s) when you've entered the debugger and do not
-		click in the debugger's window(s) while the application is running.
-	Doing either one is not necessarily fatal, but it can confuse things
-	that are going on and produce unexpected results.	 
+ptkdb can be used to debug other perlTk applications if some cautions
+are observed. Basically, do not click the mouse in the application's
+window(s) when you've entered the debugger and do not click in the
+debugger's window(s) while the application is running.  Doing either
+one is not necessarily fatal, but it can confuse things that are going
+on and produce unexpected results.
 
-	 Be aware that most perlTk applications have a central event loop.
-	User actions, such as mouse clicks, key presses, window exposures,
-	etc will generate 'events' that the script will process.	When
-	a perlTk application is running, its 'MainLoop' call will accept these
-	events and then dispatch them to appropriate callbacks associated
-	with the appropriate widgets.
+Be aware that most perlTk applications have a central event loop.
+User actions, such as mouse clicks, key presses, window exposures, etc
+will generate 'events' that the script will process. When a perlTk
+application is running, its 'MainLoop' call will accept these events
+and then dispatch them to appropriate callbacks associated with the
+appropriate widgets.
 
-	Ptkdb has its own event loop that runs whenever you've stopped at a
-		breakpoint and entered the debugger.	However, it can accept events
-		that are generated by other perlTk windows and dispatch their callbacks.
-		The problem here is that the application is supposed to be 'stopped',
-		and logically the application should not be able to process events.
+Ptkdb has its own event loop that runs whenever you've stopped at a
+breakpoint and entered the debugger. However, it can accept events
+that are generated by other perlTk windows and dispatch their
+callbacks.  The problem here is that the application is supposed to be
+'stopped', and logically the application should not be able to process
+events.
 
-		A future version of ptkdb will have an extension that will 'filter'
-		events so that application events are not processed while the
-		debugger is active, and debugger events will not be processed while
-		the target script is active.
+A future version of ptkdb will have an extension that will 'filter'
+events so that application events are not processed while the debugger
+is active, and debugger events will not be processed while the target
+script is active.
 
 =head2 Debugging CGI Scripts
 
-		One advantage of ptkdb over the builtin debugger(-d) is that it can
-		be used to debug CGI perl scripts as they run on a web server.	Be
-		sure that that your web server's perl instalation includes Tk.
+One advantage of ptkdb over the builtin debugger(-d) is that it can be
+used to debug CGI perl scripts as they run on a web server. Be sure
+that that your web server's perl instalation includes Tk.
 
 Change your
 
- #! /usr/local/bin/perl
+  #! /usr/local/bin/perl
 
 to
 
- #! /usr/local/bin/perl -d:ptkdb
+  #! /usr/local/bin/perl -d:ptkdb
 
 TIP: You can debug scripts remotely if you're using a unix based
-		Xserver and where you are authoring the script has an Xserver.	 The
-		Xserver can be another unix workstation, a Macintosh or Win32 platform
-		with an appropriate XWindows package.	 In your script insert the
-		following BEGIN subroutine:
+Xserver and where you are authoring the script has an Xserver.  The
+Xserver can be another unix workstation, a Macintosh or Win32 platform
+with an appropriate XWindows package.  In your script insert the
+following BEGIN subroutine:
 
 		sub BEGIN {
 			$ENV{'DISPLAY'} = "myHostname:0.0" ;
 		}
 
-Be sure that your web server has permission to open windows on your Xserver
-(see the xhost manpage).	
+Be sure that your web server has permission to open windows on your
+Xserver (see the xhost manpage).
 
-		Access your web page with your browswer and 'submit' the script as
-		normal.	 The ptkdb window should appear on myHostname's monitor.	At
-this point you can start debugging your script.	 Be aware that your
+Access your web page with your browswer and 'submit' the script as
+normal.  The ptkdb window should appear on myHostname's monitor. At
+this point you can start debugging your script.  Be aware that your
 browser may timeout waiting for the script to run.
 
 To expedite debugging you may want to setup your breakpoints in
 advance with a .ptkdbrc file and use the $DB::no_stop_at_start
-variable.	 NOTE: for debugging web scripts you may have to have the
+variable.  NOTE: for debugging web scripts you may have to have the
 .ptkdbrc file installed in the server account's home directory (~www)
-or whatever username your webserver is running under.	 Also try
+or whatever username your webserver is running under.  Also try
 installing a .ptkdbrc file in the same directory as the target script.
 
 =head1 KNOWN PROBLEMS
 
-=item Breakpoint Controls 
+=over
+
+=item I<Breakpoint Controls>
 
 If the size of the right hand pane is too small the breakpoint controls
 are not visible.	The breakpoints are still there, the window may have
@@ -635,6 +679,8 @@ to be enlarged in order for them to be visible.
 
 The Balloons in Tk400 will not work with ptkdb.	 All other functions
 are supported, but the Balloons require Tk800 or higher.
+
+=back
 
 =head1 AUTHOR
 
@@ -1856,6 +1902,7 @@ sub setup_search_panel {
 
 sub setup_breakpts_page {
 	my ($self) = @_ ;
+	require Tk::Table ;
 
 	$self->{'breakpts_page'} = $self->{'notebook'}->add("brkptspage", -label => "BrkPts") ;
 
@@ -2436,7 +2483,8 @@ sub fixExprPath {
 #
 sub insertExpr {
 	my($self, $reusedRefs, $dl, $theRef, $name, $depth, $dirPath) = @_ ;
-	my($label, $type, $result, $saveW, $selfCnt, @circRefs) ;
+	my($label, $type, $result, $selfCnt, @circRefs) ;
+	local($^W) = 0 ; # spare us uncessary warnings about comparing strings with == 	
 
 	#
 	# Add data new data entries to the bottom
@@ -2449,10 +2497,6 @@ sub insertExpr {
 	while( ref $theRef eq 'SCALAR' ) {
 		$theRef = $$theRef ;
 	}
-
-	$saveW = $^W ;
-	$^W = 0 ; # spare us uncessary warnings about comparing strings with == 
-	
  REF_CHECK: for( ; ; ) {
 	 push @circRefs, $theRef ;
 	 $type = ref $theRef ;
@@ -2466,11 +2510,7 @@ sub insertExpr {
 	 }
  }
 
-	$^W = $saveW ;
-
 	if( !$type || $type eq "" || $type eq "GLOB" || $type eq "CODE") {
-		$saveW = $^W ;
-		$^W = 0 ;
 		eval {
 			if( !defined $theRef ) {
 				$dl->add($dirPath . $name, -text => "$name = $label" . "undef") ;
@@ -2479,7 +2519,6 @@ sub insertExpr {
 				$dl->add($dirPath . $name, -text => "$name = $label$theRef") ;
 			}
 		} ;
-		$^W = $saveW ;
 		$self->DoAlert($@), return 0 if $@ ;
 		return 1 ;
 	}
@@ -2497,8 +2536,6 @@ sub insertExpr {
 		$result = 1 ;
 		foreach $r ( @{$theRef} ) {
 
-			$saveW = $^W ;
-			
 			if( grep $_ == $r, @$reusedRefs ) { # check to make sure that we're not doing a single level self reference
 				eval {
 					$dl->add($dirPath .  fixExprPath($name) . $Devel::ptkdb::pathSep . "__ptkdb_self_path" . $selfCnt++, -text => "[$idx] = $r REUSED ADDR") ;
@@ -2542,8 +2579,6 @@ sub insertExpr {
 
 	foreach $r ( @$theRef{@theKeys} ) { # slice out the values with the sorted list
 
-		$saveW = $^W ;
-	 
 		if( grep $_ == $r, @$reusedRefs ) { # check to make sure that we're not doing a single level self reference
 			eval {
 				$dl->add($dirPath .  fixExprPath($name) . $Devel::ptkdb::pathSep . "__ptkdb_self_path" . $selfCnt++, -text => "$theKeys[$idx++] = $r REUSED ADDR") ;
@@ -2653,9 +2688,8 @@ sub set_file {
 
 	$lineStr = " " x 200 ; # pre-allocate space for $lineStr
 	$i = 1 ;
-	my $saveW = $^W ; # spares us useless warnings under -w when checking $dbline[$_] != 0
-	$^W = 0 ;
 
+	local($^W) = 0 ; # spares us useless warnings under -w when checking $dbline[$_] != 0
 	#
 	# The 'map' call will build list of 'string', 'tag' pairs
 	# that will become arguments to the 'insert' call.	Passing
@@ -2681,8 +2715,7 @@ sub set_file {
 		
 	} @dbline[$offset+1 .. $#dbline] ) ;
 						
-						$^W = $saveW ; # restore the state of the -w flag
-
+						
 						#
 						# Apply the tags that we've collected
 						# NOTE:	 it was attempted to incorporate these
@@ -3115,13 +3148,12 @@ sub setupEvalWindow {
 sub filterBreakPts {
 	my ($breakPtsListRef, $fname) = @_ ;
 	my $dbline = $main::{'_<' . $fname}; # breakable lines
-	my $saveW ;
+	local($^W) = 0 ;
 	#
 	# Go through the list of breaks and take out any that
 	# are no longer breakable
 	#
-	$saveW = $^W ; # we're getting some warnings about using the line array like this
-	$^W = 0 ;
+
 	for( @$breakPtsListRef ) {
 		next unless defined $_ ;
 
@@ -3129,7 +3161,6 @@ sub filterBreakPts {
 
 		$_ = undef ;
 	}
-	$^W = $saveW ;		
 } # end of filterBreakPts
 
 sub DoAbout {
@@ -3174,16 +3205,13 @@ sub SetBreakPoint {
 	my $dbw = $DB::window ;
 	my $lineno = $dbw->get_lineno() ;
 	my $expr = $dbw->clear_entry_text() ;
-	my $saveW = $^W ;
+	local($^W) = 0 ;
 
-	$^W = 0 ;
 	if( !&DB::checkdbline($DB::window->{current_file}, $lineno + $self->{'line_offset'}) ) {
-		$^W = $saveW ;
 		$dbw->DoAlert("line $lineno in $DB::window->{current_file} is not breakable") ;
 		return 0 ;
 	}
 
-	$^W = $saveW ;
 	if( !$isTemp ) {
 		$dbw->insertBreakpoint($DB::window->{current_file}, $lineno, 1, $expr) ;
 		return 1 ;
@@ -3406,11 +3434,8 @@ sub set_stop_on_warning {
 		##
 		## Restore any previous warning signal
 		##
-		my($saveW) ;
-		$saveW = $^W ; # save the warning -w setting
-		$^W = 0 ; # warning disabled since undef is a valid value to set the signal to
+		local($^W) = 0 ;
 		$SIG{'__WARN__'} = $DB::ptkdb::warn_sig_save ;
-		$^W = 0 ; # resore the warning
 	}
 } # end of set_stop_on_warning
 
@@ -3420,7 +3445,7 @@ package DB ;
 
 use vars '$VERSION', '$header' ;
 
-$VERSION = '1.1074' ;
+$VERSION = '1.108' ;
 $header = "ptkdb.pm version $DB::VERSION";
 $DB::window->{current_file} = "" ;
 
@@ -3467,11 +3492,9 @@ sub checkdbline($$) {
 	return 0 unless $fname; # we're getting an undef here on 'Restart...'
 
 	local(*dbline) = $main::{'_<' . $fname} ;
+	local($^W) = 0 ; # spares us warnings under -w
 
-	my $saveW = $^W ;
-	$^W = 0 ;	 # spares us warnings under -w
 	my $flag = $dbline[$lineno] != 0 ;
-	$^W = $saveW ;
 
 	return $flag;
 	
@@ -3599,8 +3622,7 @@ sub fix_breakpoints {
 	my(@brkPts) = @_ ;
 	my($startLine, $endLine, $nLines, $brkPt) ;
 	my (@retList) ;
-	my $saveW = $^W ;
-	$^W = 0 ;
+	local($^W) = 0 ;
 
 	$nLines = scalar @dbline ;
 
@@ -3617,7 +3639,6 @@ sub fix_breakpoints {
 		}
 	} # end of breakpoint list
 	
-	$^W = $saveW ;
 	return @retList ;
 
 } # end of fix_breakpoints
@@ -3916,9 +3937,10 @@ sub breakPointEvalExpr {
 # to properly interpret the vars
 #
 sub dbeval {
-	my ($ptkdb__package, $ptkdb__expr) = @_ ;
-	my (@ptkdb__result, $ptkdb__str, $ptkdb__saveW) ;
-
+	my($ptkdb__package, $ptkdb__expr) = @_ ;
+	my(@ptkdb__result, $ptkdb__str, $ptkdb__saveW) ;
+	my(@ptkdb_args) ;
+	
 	no strict ;
 	$ptkdb__saveW = $^W ; # save the state of the "warning"(-w) flag
 	$^W = 0 ;
@@ -3932,7 +3954,10 @@ sub dbeval {
 
 	$ptkdb__expr =~ s/^\s*%/\\%/o ;
 
+	@_ = @DB::saved_args ; # replace @_ arg array with what we came in with
+
 	@ptkdb__result = eval <<__EVAL__ ;
+
 
 	\$\@ = \$DB::save_err ;
 
@@ -3968,11 +3993,16 @@ sub dbexit {
 # Refs:	 Progamming Perl 2nd Edition, Larry Wall, O'Reilly & Associates, Chapter 8
 #
 sub DB {
+	@DB::saved_args = @_ ; # save arg context
  $DB::save_err = $@ ; # save value of $@
 	 my ($package, $filename, $line) = caller ;
 	 my ($stop, $cnt) ;
 
-	 &DB::Initialize($filename) unless $DB::ptkdb::isInitialized ; # do some setup stuff our first time through
+	 unless( $DB::ptkdb::isInitialized ) {
+		 return if( $filename ne $0 ) ; # not in our target file
+				 
+		 &DB::Initialize($filename) ;
+	 }
 
 	 if (!isBreakPoint($filename, $line, $package) ) {
 	 $DB::single = 0 ;
